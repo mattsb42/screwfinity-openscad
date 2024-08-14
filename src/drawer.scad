@@ -5,16 +5,16 @@ $fs=0.4;
 SMALL = 20;
 MEDIUM = 30;
 LARGE = 40;
-U_EDGE = 42;
+DRAWER_UNIT_WIDTH = 40;
 D_EDGE = 40;
 HORIZONTAL_GAP = 0.5;
 
 module Drawer(height, drawer_wall=1, u_width=1, u_depth=2) {
     outside_height = height;
     inside_height = height - drawer_wall;
-    outside_width = (u_width * D_EDGE) - (HORIZONTAL_GAP * 2);
+    outside_width = (u_width * DRAWER_UNIT_WIDTH) - (HORIZONTAL_GAP * 2);
     inside_width = outside_width - (2 * drawer_wall);
-    outside_depth = u_depth * D_EDGE;
+    outside_depth = (u_depth * GRIDFINITY_GRID_LENGTH) - CABINET_REAR_WALL - DRAWER_STOP;
     inside_depth = outside_depth - (2 * drawer_wall);
 
     module Body()
@@ -88,5 +88,3 @@ module Drawer(height, drawer_wall=1, u_width=1, u_depth=2) {
             cube([outside_width * 2, outside_depth *2, drawer_wall + 0.003], center=true);
     }
 }
-
-Drawer(SMALL, u_width=1);
