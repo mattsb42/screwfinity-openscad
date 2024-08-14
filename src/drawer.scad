@@ -1,7 +1,5 @@
 include <./constants.scad>;
 use <./MCAD/boxes.scad>;
-$fa=1;
-$fs=0.4;
 
 module Drawer(height, drawer_wall=1, u_width=1, u_depth=2) {
     outside_height = height;
