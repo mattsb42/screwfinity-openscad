@@ -20,10 +20,12 @@ module Drawer(height, drawer_wall=1, u_width=1, u_depth=2) {
     module Handle() {
         handle_lip = 8;
         handle_support_width = 10;
-        edge = [outside_width / 2 - drawer_wall, 0, outside_height / 2];
+        edge = [outside_width / 2 - drawer_wall, drawer_wall * 2, outside_height / 2];
 
         module TopLeft() translate([edge[0], 0, edge[2]]) sphere(r=drawer_wall);
         module TopRight() translate([-1 * edge[0], 0, edge[2]]) sphere(r=drawer_wall);
+        module UpperLipLeft() translate([edge[0], edge[1], edge[2]]) sphere(r=drawer_wall);
+        module UpperLipRight() translate([-1 * edge[0], edge[1], edge[2]]) sphere(r=drawer_wall);
         module BottomLeft() translate([edge[0], 0, (-1 * edge[2]) + drawer_wall]) sphere(r=drawer_wall);
         module BottomRight() translate([-1 * edge[0], 0, (-1 * edge[2]) + drawer_wall]) sphere(r=drawer_wall);
         module OuterLipLeft() translate([edge[0], handle_lip, 0]) sphere(r=drawer_wall);
@@ -53,6 +55,8 @@ module Drawer(height, drawer_wall=1, u_width=1, u_depth=2) {
             hull() {
                 TopRight();
                 TopLeft();
+                UpperLipLeft();
+                UpperLipRight();
                 OuterLipRight();
                 OuterLipLeft();
             }
