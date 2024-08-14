@@ -1,18 +1,12 @@
+include <./constants.scad>;
 use <./MCAD/boxes.scad>;
 $fa=1;
 $fs=0.4;
 
-SMALL = 20;
-MEDIUM = 30;
-LARGE = 40;
-DRAWER_UNIT_WIDTH = 40;
-D_EDGE = 40;
-HORIZONTAL_GAP = 0.5;
-
 module Drawer(height, drawer_wall=1, u_width=1, u_depth=2) {
     outside_height = height;
     inside_height = height - drawer_wall;
-    outside_width = (u_width * DRAWER_UNIT_WIDTH) - (HORIZONTAL_GAP * 2);
+    outside_width = (u_width * DRAWER_UNIT_SLOT_WIDTH) - (DRAWER_TOLERANCE * 2);
     inside_width = outside_width - (2 * drawer_wall);
     outside_depth = (u_depth * GRIDFINITY_GRID_LENGTH) - CABINET_REAR_WALL - DRAWER_STOP;
     inside_depth = outside_depth - (2 * drawer_wall);
