@@ -4,13 +4,69 @@ module Cabinet(drawer_height, drawer_u_width, u_width, u_depth, drawer_rows) {
     outer_wall = 1.5;
     inner_wall = 0.5;
     ceiling_floor = 0.5;
+
+    assert(
+        u_width % 1 == 0,
+        str(
+            "ERROR: Invalid u_width value ",
+            u_width,
+            " must be an integer."
+        )
+    );
+
+    assert(
+        u_depth % 1 == 0,
+        str(
+            "ERROR: Invalid u_depth value ",
+            u_depth,
+            " must be an integer."
+        )
+    );
+
+    assert(
+        drawer_rows % 1 == 0,
+        str(
+            "ERROR: Invalid drawer_rows value ",
+            drawer_rows,
+            " must be an integer."
+        )
+    );
+
+    assert(
+        u_width % drawer_u_width == 0,
+        str(
+            "ERROR: Invalid drawer and cabinet width selection. ",
+            "Cabinet unit width ",
+            u_width,
+            " is not evenly divisible by drawer unit width ",
+            drawer_u_width
+        )
+    );
+
     drawer_columns = u_width / drawer_u_width;
 
     
     shell_outer_width = GRIDFINITY_GRID_LENGTH * u_width;
     shell_inner_width = shell_outer_width - (outer_wall * 2);
     drawer_slot_inner_width = DRAWER_UNIT_SLOT_WIDTH * drawer_u_width;
-    drawer_slot_outer_width = shell_inner_width / drawer_columns;
+
+    // For single-u-width drawers and a single-column cabinet,
+    // the math doesn't work out quite right.
+    // TODO: fix this later
+    // but for now just cheat.
+    single_column_single_u = drawer_u_width == 1 && drawer_columns == 1;
+    drawer_slot_outer_width = (single_column_single_u)
+        ? shell_inner_width
+        : shell_inner_width / drawer_columns;
+    assert(
+        single_column_single_u || drawer_slot_outer_width > drawer_slot_inner_width,
+        str(
+            "ERROR: Drawer slot impossible dimensions. Inner width ",
+            drawer_slot_inner_width,
+            " is wider than outer width ",
+            drawer_slot_outer_width
+        )
+    );
     
     drawer_slot_inner_height = drawer_height + (2 * DRAWER_TOLERANCE);
     drawer_slot_outer_height = drawer_slot_inner_height + (2 * inner_wall);
@@ -87,6 +143,7 @@ module Cabinet(drawer_height, drawer_u_width, u_width, u_depth, drawer_rows) {
         CubeCup(inner_width, inner_depth, inner_height, outer_width, outer_depth, outer_height, rear_wall_thickness=CABINET_REAR_WALL);
     }
 
+    // Locate the correct center position for a drawer slot.
     function traverse (column, row) =
         let(origin=[
             (shell_inner_width / 2) - (drawer_slot_outer_width / 2),
@@ -98,8 +155,10 @@ module Cabinet(drawer_height, drawer_u_width, u_width, u_depth, drawer_rows) {
         )
             [column_position, 0, row_position];
 
+    // Alternate drawer colors in a grid pattern.
     function drawer_color (column, row) =
-        let(color_options=[["red", "green"], ["green", "red"]])
+        let(evens="blue", odds="yellow")
+        let(color_options=[[odds, evens], [evens, odds]])
         color_options[column % 2][row % 2];
 
     module CabinetBody() {
