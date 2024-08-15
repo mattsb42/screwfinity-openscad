@@ -11,7 +11,7 @@ module Drawer(height, drawer_wall=1, u_width=1, u_depth=2) {
             " must be an integer."
         )
     );
-    
+
     outside_height = height;
     inside_height = height - drawer_wall;
     outside_width = (u_width * DRAWER_UNIT_SLOT_WIDTH) - (DRAWER_TOLERANCE * 2);
@@ -70,22 +70,16 @@ module Drawer(height, drawer_wall=1, u_width=1, u_depth=2) {
             }
         }
 
-        module HandleBody() {
-            LeftBase();
-            RightBase();
-            Face();
-        }
-
-        // move to front of drawer
-        translate([0, outside_depth / 2 - drawer_wall, 0]){
-            HandleBody();
-        }
+        LeftBase();
+        RightBase();
+        Face();
     }
 
     difference() {
         union() {
             Body();
-            Handle();
+            translate([0, outside_depth / 2 - drawer_wall, 0])
+                Handle();
         }
         translate([0, 0, (drawer_wall / 2)])
             InnerBodySquare();
