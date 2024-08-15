@@ -1,7 +1,3 @@
-DRAWER_SLOT_WIDTH = 39;
-CABINET_OUTER_WALL = 1;
-CABINET_SLOT_WALL = 1;
-
 // Standard gridfinity grid size.
 GRIDFINITY_GRID_LENGTH = 42;
 
@@ -14,7 +10,7 @@ DRAWER_STOP = 2;
 // Gap between drawer and walls.
 DRAWER_TOLERANCE = 0.5;
 
-// Width of a drawer unit slot.
+// Interior width of a drawer unit slot.
 DRAWER_UNIT_SLOT_WIDTH = 40;
 
 // Standard sizes
