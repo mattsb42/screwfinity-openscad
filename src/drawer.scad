@@ -2,6 +2,16 @@ include <./constants.scad>;
 use <./MCAD/boxes.scad>;
 
 module Drawer(height, drawer_wall=1, u_width=1, u_depth=2) {
+
+    assert(
+        u_depth % 1 == 0,
+        str(
+            "ERROR: Invalid u_depth value ",
+            u_depth,
+            " must be an integer."
+        )
+    );
+    
     outside_height = height;
     inside_height = height - drawer_wall;
     outside_width = (u_width * DRAWER_UNIT_SLOT_WIDTH) - (DRAWER_TOLERANCE * 2);
