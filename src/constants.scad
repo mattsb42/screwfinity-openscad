@@ -11,7 +11,7 @@ DRAWER_STOP = 2;
 DRAWER_TOLERANCE = 0.5;
 
 // Interior width of a drawer unit slot.
-DRAWER_UNIT_SLOT_WIDTH = 40;
+DRAWER_UNIT_SLOT_WIDTH = 39;
 
 // Standard sizes
 SMALL = 20;
