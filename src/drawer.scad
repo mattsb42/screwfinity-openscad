@@ -1,7 +1,8 @@
 include <./constants.scad>;
+include <./options.scad>;
 use <./MCAD/boxes.scad>;
 
-module Drawer(height, drawer_wall=1, u_width=1, u_depth=2) {
+module Drawer(height, drawer_wall=1, u_width=1, u_depth=2, fill_type=SQUARE_CUT) {
 
     assert(
         u_depth % 1 == 0,
@@ -9,6 +10,14 @@ module Drawer(height, drawer_wall=1, u_width=1, u_depth=2) {
             "ERROR: Invalid u_depth value ",
             u_depth,
             " must be an integer."
+        )
+    );
+
+    assert(
+        fill_type == NO_FILL || fill_type == SQUARE_CUT,
+        str(
+            "ERROR: Invalid fill type ",
+            fill_type
         )
     );
 
@@ -81,8 +90,9 @@ module Drawer(height, drawer_wall=1, u_width=1, u_depth=2) {
             translate([0, outside_depth / 2 - drawer_wall, 0])
                 Handle();
         }
-        translate([0, 0, (drawer_wall / 2)])
-            InnerBodySquare();
+        translate([0, 0, (drawer_wall / 2)]) {
+            if (fill_type == SQUARE_CUT) InnerBodySquare();
+        }
         // slice off everything above the top
         translate([0, 0, (outside_height / 2) + (drawer_wall / 2) + 0.001])
             cube([outside_width * 2, outside_depth *2, drawer_wall + 0.003], center=true);
