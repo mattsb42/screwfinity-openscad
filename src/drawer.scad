@@ -23,7 +23,7 @@ module Drawer(height, drawer_wall=1, u_width=1, u_depth=2, fill_type=SQUARE_CUT)
 
     outside_height = height;
     inside_height = height - drawer_wall;
-    outside_width = (u_width * DRAWER_UNIT_SLOT_WIDTH) - (DRAWER_TOLERANCE * 2);
+    outside_width = (u_width * GRIDFINITY_GRID_LENGTH) - GU_TO_DU - (DRAWER_TOLERANCE * 2);
     inside_width = outside_width - (2 * drawer_wall);
     outside_depth = (u_depth * GRIDFINITY_GRID_LENGTH) - CABINET_REAR_WALL - DRAWER_STOP;
     inside_depth = outside_depth - (2 * drawer_wall);

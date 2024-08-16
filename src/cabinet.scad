@@ -1,8 +1,8 @@
 include <./constants.scad>;
 
 module Cabinet(drawer_height, drawer_u_width, u_width, u_depth, drawer_rows) {
-    outer_wall = 1.5;
-    inner_wall = 0.5;
+    outer_wall = 2.0;
+    inner_wall = 1.0;
     ceiling_floor = 0.5;
 
     assert(
@@ -47,13 +47,24 @@ module Cabinet(drawer_height, drawer_u_width, u_width, u_depth, drawer_rows) {
 
     
     shell_outer_width = GRIDFINITY_GRID_LENGTH * u_width;
-    shell_inner_width = shell_outer_width - (outer_wall * 2);
-    drawer_slot_inner_width = DRAWER_UNIT_SLOT_WIDTH * drawer_u_width;
+    maximum_shell_inner_width = shell_outer_width - (outer_wall * 2);
 
-    single_column_single_u = drawer_u_width == 1 && drawer_columns == 1;
-    drawer_slot_outer_width = shell_inner_width / drawer_columns;
+    drawer_slot_inner_width = (drawer_u_width * GRIDFINITY_GRID_LENGTH) - GU_TO_DU;
+
+
+    minimum_drawer_slot_outer_width = drawer_slot_inner_width + inner_wall;
+    // The buffer space to add to each required wall.
+    wall_buffer = 
+        (maximum_shell_inner_width - (minimum_drawer_slot_outer_width * drawer_columns))
+        / (drawer_columns + 1);
+    // The wall buffer is the extra space on each vertical that is not a drawer slot.
+    // Each outer wall gets two halves.
+    shell_inner_width = maximum_shell_inner_width - wall_buffer;
+    // Each drawer slot "outer" gets two halves.
+    drawer_slot_outer_width = minimum_drawer_slot_outer_width + wall_buffer;
+    
     assert(
-        single_column_single_u || drawer_slot_outer_width > drawer_slot_inner_width,
+        drawer_slot_outer_width > drawer_slot_inner_width,
         str(
             "ERROR: Drawer slot impossible dimensions. Inner width ",
             drawer_slot_inner_width,
@@ -63,7 +74,7 @@ module Cabinet(drawer_height, drawer_u_width, u_width, u_depth, drawer_rows) {
     );
     
     drawer_slot_inner_height = drawer_height + (2 * DRAWER_TOLERANCE);
-    drawer_slot_outer_height = drawer_slot_inner_height + (2 * inner_wall);
+    drawer_slot_outer_height = drawer_slot_inner_height + inner_wall;
     
     shell_inner_height = drawer_slot_outer_height * drawer_rows;
 
@@ -128,7 +139,10 @@ module Cabinet(drawer_height, drawer_u_width, u_width, u_depth, drawer_rows) {
     // Locate the correct center position for a drawer slot.
     function traverse (column, row) =
         let(origin=[
-            (shell_inner_width / 2) - (drawer_slot_outer_width / 2),
+            // move to left edge
+            (shell_inner_width / 2)
+                // move to the center of the first drawer
+                - (drawer_slot_outer_width / 2),
             (shell_inner_height / 2) - (drawer_slot_outer_height / 2)
         ])
         let(
@@ -144,7 +158,7 @@ module Cabinet(drawer_height, drawer_u_width, u_width, u_depth, drawer_rows) {
             translate([0, CABINET_REAR_WALL / 2, 0])
                 for (column = [0: drawer_columns - 1])
                     for (row = [0: drawer_rows - 1]){
-                        echo(column, " ::: ", row);
+                        echo(str("column ", column, ", row ", row, " at position ", traverse(column, row)));
                         translate(traverse(column, row))
                             DrawerSlotNegative();
                     }

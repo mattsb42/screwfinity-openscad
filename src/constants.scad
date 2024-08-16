@@ -10,5 +10,5 @@ DRAWER_STOP = 2;
 // Gap between drawer and walls.
 DRAWER_TOLERANCE = 0.5;
 
-// Interior width of a drawer unit slot.
-DRAWER_UNIT_SLOT_WIDTH = 39;
+// Difference between grid_u and drawer_u slot interior width.
+GU_TO_DU = 3;
