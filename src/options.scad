@@ -7,3 +7,7 @@ LARGE = 40;
 NO_CUT = 0;
 SCOOP_CUT = 1;
 SQUARE_CUT = 2;
+
+// Cabinet base options
+NO_BASE = 0;
+GRIDFINITY_BASE = 1;

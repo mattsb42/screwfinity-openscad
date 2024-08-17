@@ -1,6 +1,17 @@
 include <./constants.scad>;
+include <./options.scad>;
+use <./gridfinity-rebuilt-openscad/gridfinity-rebuilt-utility.scad>;
+use <./gridfinity-rebuilt-openscad/gridfinity-rebuilt-holes.scad>;
 
-module Cabinet(drawer_height, drawer_u_width, u_width, u_depth, drawer_rows) {
+module Cabinet(
+    drawer_height,
+    drawer_u_width,
+    u_width,
+    u_depth,
+    drawer_rows,
+    base_style=GRIDFINITY_BASE,
+    hole_options=bundle_hole_options(magnet_hole=true)
+) {
     outer_wall = 2.0;
     inner_wall = 1.0;
     ceiling_floor = 0.5;
@@ -40,6 +51,14 @@ module Cabinet(drawer_height, drawer_u_width, u_width, u_depth, drawer_rows) {
             u_width,
             " is not evenly divisible by drawer unit width ",
             drawer_u_width
+        )
+    );
+
+    assert(
+        base_style == NO_BASE || base_style == GRIDFINITY_BASE,
+        str(
+            "ERROR: Invalid base style: ",
+            base_style
         )
     );
 
@@ -213,4 +232,16 @@ module Cabinet(drawer_height, drawer_u_width, u_width, u_depth, drawer_rows) {
     }
 
     CabinetBody();
+    if(base_style == GRIDFINITY_BASE) {
+        translate([0, 0, (-1 * shell_outer.z / 2) - 5]) 
+        color("red")
+        gridfinityBase(
+            gx=u_width,
+            gy=u_depth,
+            l=GRIDFINITY_GRID_LENGTH,
+            dx=0,
+            dy=0,
+            hole_options=hole_options
+        );
+    }
 }
