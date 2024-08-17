@@ -241,27 +241,46 @@ module Cabinet(
         }
     }
 
+    module GridFinityBase () {
+        translate([0, 0, (-1 * shell_outer.z / 2) - 5]) 
+        color("red")
+            gridfinityBase(
+                gx=u_width,
+                gy=u_depth,
+                l=GRIDFINITY_GRID_LENGTH,
+                dx=0,
+                dy=0,
+                hole_options=hole_options
+            );
+    }
+
     module CabinetBase() {
-        if(base_style == GRIDFINITY_BASE) {
-            translate([0, 0, (-1 * shell_outer.z / 2) - 5]) 
-            color("red")
-                gridfinityBase(
-                    gx=u_width,
-                    gy=u_depth,
-                    l=GRIDFINITY_GRID_LENGTH,
-                    dx=0,
-                    dy=0,
-                    hole_options=hole_options
+        if(base_style == GRIDFINITY_BASE) GridFinityBase();
+    }
+
+    module LipTop() {
+        cross_section = [2, 4];
+        translate([0, 0, (shell_outer.z / 2) + (cross_section.y / 2)]) {
+            // add a rim around the lip; the lip by itself is too thin at the edge
+            outer_buffer_width = 0.25;
+            color("blue")
+            difference() {
+                cube([shell_outer.x, shell_outer.y, cross_section.y], center=true);
+                // make the cut-out cube taller to remove render preview artifacts
+                cube([shell_outer.x - outer_buffer_width, shell_outer.y - outer_buffer_width, cross_section.y + 1], center=true);
+            }
+            // add the lip
+            color("green")
+                Lip(
+                    footprint=[shell_outer.x - outer_buffer_width, shell_outer.y - outer_buffer_width],
+                    cross_section=cross_section,
+                    center=true
                 );
         }
     }
 
     module CabinetTop() {
-        if(top_style == LIP_TOP) {
-            translate([-1 * shell_outer.x / 2, -1 * shell_outer.y / 2, shell_outer.z / 2])
-            color("green")
-            Lip(footprint=shell_outer, cross_section=[2, 4], center=false);            
-        }
+        if(top_style == LIP_TOP) LipTop();
     }
 
     CabinetTop();
