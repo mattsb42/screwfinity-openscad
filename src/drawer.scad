@@ -14,7 +14,7 @@ module Drawer(height, drawer_wall=1, u_width=1, u_depth=2, fill_type=SQUARE_CUT)
     );
 
     assert(
-        fill_type == NO_FILL || fill_type == SQUARE_CUT || fill_type == SCOOP_CUT,
+        fill_type == NO_CUT || fill_type == SQUARE_CUT || fill_type == SCOOP_CUT,
         str(
             "ERROR: Invalid fill type ",
             fill_type
