@@ -1,5 +1,6 @@
 include <./constants.scad>;
 include <./options.scad>;
+use <./util.scad>;
 use <./gridfinity-rebuilt-openscad/gridfinity-rebuilt-utility.scad>;
 use <./gridfinity-rebuilt-openscad/gridfinity-rebuilt-holes.scad>;
 
@@ -10,7 +11,8 @@ module Cabinet(
     u_depth,
     drawer_rows,
     base_style=GRIDFINITY_BASE,
-    hole_options=bundle_hole_options(magnet_hole=true)
+    hole_options=bundle_hole_options(magnet_hole=true),
+    top_style=LIP_TOP,
 ) {
     outer_wall = 2.0;
     inner_wall = 1.0;
@@ -59,6 +61,14 @@ module Cabinet(
         str(
             "ERROR: Invalid base style: ",
             base_style
+        )
+    );
+
+    assert(
+        top_style == NO_TOP || top_style == LIP_TOP,
+        str(
+            "ERROR: Invalid top style: ",
+            top_style
         )
     );
 
@@ -231,17 +241,30 @@ module Cabinet(
         }
     }
 
-    CabinetBody();
-    if(base_style == GRIDFINITY_BASE) {
-        translate([0, 0, (-1 * shell_outer.z / 2) - 5]) 
-        color("red")
-        gridfinityBase(
-            gx=u_width,
-            gy=u_depth,
-            l=GRIDFINITY_GRID_LENGTH,
-            dx=0,
-            dy=0,
-            hole_options=hole_options
-        );
+    module CabinetBase() {
+        if(base_style == GRIDFINITY_BASE) {
+            translate([0, 0, (-1 * shell_outer.z / 2) - 5]) 
+            color("red")
+                gridfinityBase(
+                    gx=u_width,
+                    gy=u_depth,
+                    l=GRIDFINITY_GRID_LENGTH,
+                    dx=0,
+                    dy=0,
+                    hole_options=hole_options
+                );
+        }
     }
+
+    module CabinetTop() {
+        if(top_style == LIP_TOP) {
+            translate([-1 * shell_outer.x / 2, -1 * shell_outer.y / 2, shell_outer.z / 2])
+            color("green")
+            Lip(footprint=shell_outer, cross_section=[2, 4], center=false);            
+        }
+    }
+
+    CabinetTop();
+    CabinetBody();
+    CabinetBase();
 }

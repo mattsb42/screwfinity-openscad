@@ -11,3 +11,8 @@ SQUARE_CUT = 2;
 // Cabinet base options
 NO_BASE = 0;
 GRIDFINITY_BASE = 1;
+
+// Cabinet top options
+NO_TOP = 0;
+GRIDFINITY_TOP = 1;
+LIP_TOP = 2;
