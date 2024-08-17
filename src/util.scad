@@ -12,7 +12,7 @@ module Lip(footprint, cross_section, center=false) {
     echo(str("cross section: ", cross_section));
     echo(str("tan angle: ", tan_angle));
 
-    translate(center ? [-1 * footprint.x / 2, -1 * footprint.y / 2, -1 * height / 2] : [0, 0, 0]) {
+    translate(center ? [-1 * footprint.x / 2, -1 * footprint.y / 2, -1 * cross_section.y / 2] : [0, 0, 0]) {
         rotate([-90, -90, 0]) {
             triangle(o_len=cross_section.x, a_len=cross_section.y, depth=footprint.y, center=false);
             translate([0, 0, footprint.y])
