@@ -45,58 +45,107 @@ module Cabinet(drawer_height, drawer_u_width, u_width, u_depth, drawer_rows) {
 
     drawer_columns = u_width / drawer_u_width;
 
+    // Inner dimensions of a drawer slot cutout.
+    drawer_slot_inner = [
+        (drawer_u_width * GRIDFINITY_GRID_LENGTH) - GU_TO_DU,
+        (GRIDFINITY_GRID_LENGTH * u_depth) - CABINET_REAR_WALL,
+        drawer_height + (2 * DRAWER_TOLERANCE),
+    ];
     
     shell_outer_width = GRIDFINITY_GRID_LENGTH * u_width;
     maximum_shell_inner_width = shell_outer_width - (outer_wall * 2);
 
-    drawer_slot_inner_width = (drawer_u_width * GRIDFINITY_GRID_LENGTH) - GU_TO_DU;
-
-
-    minimum_drawer_slot_outer_width = drawer_slot_inner_width + inner_wall;
+    minimum_drawer_slot_outer_width = drawer_slot_inner.x + inner_wall;
     // The buffer space to add to each required wall.
     wall_buffer = 
         (maximum_shell_inner_width - (minimum_drawer_slot_outer_width * drawer_columns))
         / (drawer_columns + 1);
     // The wall buffer is the extra space on each vertical that is not a drawer slot.
-    // Each outer wall gets two halves.
-    shell_inner_width = maximum_shell_inner_width - wall_buffer;
-    // Each drawer slot "outer" gets two halves.
-    drawer_slot_outer_width = minimum_drawer_slot_outer_width + wall_buffer;
     
+    // "Outer" dimensions of a virtual drawer slot,
+    //  with the necessary boundaries around the cutout.
+    drawer_slot_outer = [
+        // Each drawer slot "outer" gets two halves of a wall buffer.
+        minimum_drawer_slot_outer_width + wall_buffer,
+        // The drawer slot "outer" dimension is the same as the inner.
+        drawer_slot_inner.y,
+        drawer_slot_inner.z + inner_wall,
+    ];
+    
+    // I'm not entirely sure that the bad case is reachable anymore,
+    //  but I'm going to leave this check here just in case.
     assert(
-        drawer_slot_outer_width > drawer_slot_inner_width,
+        drawer_slot_outer.x > drawer_slot_inner.x,
         str(
             "ERROR: Drawer slot impossible dimensions. Inner width ",
-            drawer_slot_inner_width,
+            drawer_slot_inner.x,
             " is wider than outer width ",
-            drawer_slot_outer_width
+            drawer_slot_outer.x
         )
     );
     
-    drawer_slot_inner_height = drawer_height + (2 * DRAWER_TOLERANCE);
-    drawer_slot_outer_height = drawer_slot_inner_height + inner_wall;
-    
-    shell_inner_height = drawer_slot_outer_height * drawer_rows;
+    // "Inner" dimensions of a virtual cabinet shell inner space,
+    //  with the neccessary boundaries around the drawer slot cutouts.
+    shell_inner = [
+        // Each outer wall gets two halves of a wall buffer.
+        maximum_shell_inner_width - wall_buffer,
+        drawer_slot_outer.y,
+        drawer_slot_outer.z * drawer_rows,
+    ];
+
+    // Outer dimensions of the cabinet shell.
+    shell_outer = [
+        maximum_shell_inner_width + (outer_wall * 2),
+        shell_inner.y + outer_wall,
+        shell_inner.z + (outer_wall * 2),
+    ];
+
+    expected_outer_dimensions = [
+        GRIDFINITY_GRID_LENGTH * u_width,
+        GRIDFINITY_GRID_LENGTH * u_depth,
+    ];
+    assert(
+        expected_outer_dimensions.x == shell_outer.x,
+        str(
+            "ERROR: Shell outer X dimension drift detected.",
+            " Expected: ", expected_outer_dimensions.x,
+            " Actual: ", shell_outer.x
+        )
+    );
+    assert(
+        expected_outer_dimensions.y == shell_outer.y,
+        str(
+            "ERROR: Shell outer Y dimension drift detected.",
+            " Expected: ", expected_outer_dimensions.y,
+            " Actual: ", shell_outer.y
+        )
+    );
 
     module DrawerStop() {
+        // Width of the drawer stop across the slot opening.
         stop_width = 20;
+        // Horizonal distance from end of drawer stop to the peak.
         slope_run = 0.5;
+        // Height of drawer stop.
         stop_height = 1;
 
-        inner_left = [-1 * stop_width / 2, DRAWER_STOP / 2, 0];
-        inner_right = [stop_width / 2, DRAWER_STOP / 2, 0];
-        outer_left = [-1 * stop_width / 2, -1 * DRAWER_STOP / 2, 0];
-        outer_right = [stop_width / 2, -1 * DRAWER_STOP / 2, 0];
-        peak_left = [-1 * (stop_width / 2 - slope_run), 0, stop_height];
-        peak_right = [stop_width / 2 - slope_run, 0, stop_height];
+        base = [
+            // inner edge
+            [[-1 * stop_width / 2, DRAWER_STOP / 2, 0], [stop_width / 2, DRAWER_STOP / 2, 0]],
+            // outer edge
+            [[-1 * stop_width / 2, -1 * DRAWER_STOP / 2, 0], [stop_width / 2, -1 * DRAWER_STOP / 2, 0]],
+        ];
+        peak = [
+            [-1 * (stop_width / 2 - slope_run), 0, stop_height], [stop_width / 2 - slope_run, 0, stop_height],
+        ];
         polyhedron(
             points=[
-                inner_left,
-                inner_right,
-                outer_left,
-                outer_right,
-                peak_left,
-                peak_right,
+                base[0].x,
+                base[0].y,
+                base[1].x,
+                base[1].y,
+                peak.x,
+                peak.y,
             ],
             faces=[
                 // bottom face
@@ -114,25 +163,23 @@ module Cabinet(drawer_height, drawer_u_width, u_width, u_depth, drawer_rows) {
     }
 
     module DrawerSlotNegative() {
-        inner_width = drawer_slot_inner_width;
-        inner_depth = (GRIDFINITY_GRID_LENGTH * u_depth) - CABINET_REAR_WALL;
-        inner_height = drawer_slot_inner_height;
         difference(){
-            cube([inner_width, inner_depth, inner_height], center=true);
-            translate([0, (inner_depth / 2) - (DRAWER_STOP / 2), -1 * inner_height / 2])
+            cube(drawer_slot_inner, center=true);
+            translate([
+                0,
+                (drawer_slot_inner.y / 2) - (DRAWER_STOP / 2),
+                -1 * drawer_slot_inner.z / 2
+            ])
                 DrawerStop();
         }
     }
 
     module SolidCabinet() {
-        outer_width = shell_outer_width;
-        outer_depth = GRIDFINITY_GRID_LENGTH * u_depth;
-        outer_height = shell_inner_height + (outer_wall * 2);
         difference() {
-            cube([outer_width, outer_depth, outer_height], center=true);
+            cube(shell_outer, center=true);
             // trim off the front film
-            translate([0, (outer_depth / 2) + 0.001, 0])
-                cube([outer_width, 0.003, outer_height], center=true);
+            translate([0, (shell_outer.y / 2) + 0.001, 0])
+                cube([shell_outer.x, 0.003, shell_outer.z], center=true);
         }
     }
 
@@ -140,14 +187,14 @@ module Cabinet(drawer_height, drawer_u_width, u_width, u_depth, drawer_rows) {
     function traverse (column, row) =
         let(origin=[
             // move to left edge
-            (shell_inner_width / 2)
+            (shell_inner.x / 2)
                 // move to the center of the first drawer
-                - (drawer_slot_outer_width / 2),
-            (shell_inner_height / 2) - (drawer_slot_outer_height / 2)
+                - (drawer_slot_outer.x / 2),
+            (shell_inner.z / 2) - (drawer_slot_outer.z / 2)
         ])
         let(
-            column_position=origin.x - (drawer_slot_outer_width * column),
-            row_position=origin.y - (drawer_slot_outer_height * row)
+            column_position=origin.x - (drawer_slot_outer.x * column),
+            row_position=origin.y - (drawer_slot_outer.z * row)
         )
             [column_position, 0, row_position];
 
