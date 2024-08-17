@@ -3,6 +3,14 @@ include <./options.scad>;
 use <./util.scad>;
 use <./gridfinity-rebuilt-openscad/gridfinity-rebuilt-utility.scad>;
 use <./gridfinity-rebuilt-openscad/gridfinity-rebuilt-holes.scad>;
+include <./gridfinity-rebuilt-openscad/standard.scad>;
+
+function shell_options (width, depth) = [
+];
+
+function row_options () = [];
+
+function drawer_slot_options (height, width, count) = [];
 
 module Cabinet(
     drawer_height,
@@ -65,7 +73,7 @@ module Cabinet(
     );
 
     assert(
-        top_style == NO_TOP || top_style == LIP_TOP,
+        top_style == NO_TOP || top_style == LIP_TOP || top_style == GRIDFINITY_STACKING_TOP,
         str(
             "ERROR: Invalid top style: ",
             top_style
@@ -279,8 +287,22 @@ module Cabinet(
         }
     }
 
+    module GridFinityStackingLip() {
+        // There's an extra 1mm offset somewhere (haven't pinned down where it comes from)
+        //  and add an extra micrometer to remove render artifacts.
+        actual_offset = h_base + 1.001;
+        translate([0, 0, (shell_outer.z/2) - actual_offset]) {
+            difference() {
+                gridfinityInit(gx = u_width, gy = u_depth, h = 1);
+                translate([-1 * shell_outer.x / 2, -1 * shell_outer.y / 2, 0])
+                    cube([shell_outer.x, shell_outer.y, actual_offset]);
+            }
+        }
+    }
+
     module CabinetTop() {
         if(top_style == LIP_TOP) LipTop();
+        else if(top_style == GRIDFINITY_STACKING_TOP) GridFinityStackingLip();
     }
 
     CabinetTop();

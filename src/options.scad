@@ -14,5 +14,5 @@ GRIDFINITY_BASE = 1;
 
 // Cabinet top options
 NO_TOP = 0;
-GRIDFINITY_TOP = 1;
-LIP_TOP = 2;
+LIP_TOP = 1;
+GRIDFINITY_STACKING_TOP = 2;
