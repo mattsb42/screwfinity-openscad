@@ -1,5 +1,6 @@
 include <./constants.scad>;
 include <./options.scad>;
+use <./util.scad>;
 use <./MCAD/boxes.scad>;
 
 module Drawer(height, drawer_wall=1, u_width=1, u_depth=2, fill_type=SQUARE_CUT) {
@@ -33,7 +34,12 @@ module Drawer(height, drawer_wall=1, u_width=1, u_depth=2, fill_type=SQUARE_CUT)
     ];
 
     module Body() {
-        roundedCube(size=[outside.x, outside.y, outside.z], r=drawer_wall, sidesonly=true, center=true);
+        difference() {
+            roundedCube(size=[outside.x, outside.y, outside.z], r=drawer_wall, sidesonly=true, center=true);
+            // chamfer
+            translate([-1 * outside.x / 2, -1 * outside.y / 2, -1 * outside.z / 2])
+                Lip(footprint=outside, height=CHAMFER_HEIGHT);
+        }
     }
 
     module SquareCutoutRear() {
