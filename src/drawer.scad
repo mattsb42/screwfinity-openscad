@@ -21,24 +21,29 @@ module Drawer(height, drawer_wall=1, u_width=1, u_depth=2, fill_type=SQUARE_CUT)
         )
     );
 
-    outside_height = height;
-    inside_height = height - drawer_wall;
-    outside_width = (u_width * GRIDFINITY_GRID_LENGTH) - GU_TO_DU - (DRAWER_TOLERANCE * 2);
-    inside_width = outside_width - (2 * drawer_wall);
-    outside_depth = (u_depth * GRIDFINITY_GRID_LENGTH) - CABINET_REAR_WALL - DRAWER_STOP;
-    inside_depth = outside_depth - (2 * drawer_wall);
+    outside = [
+        (u_width * GRIDFINITY_GRID_LENGTH) - GU_TO_DU - (DRAWER_TOLERANCE * 2),
+        (u_depth * GRIDFINITY_GRID_LENGTH) - CABINET_REAR_WALL - DRAWER_STOP,
+        height,
+    ];
+    inside = [
+        outside.x - (2 * drawer_wall),
+        outside.y - (2 * drawer_wall),
+        outside.z - drawer_wall
+    ];
 
-    module Body()
-        roundedCube(size=[outside_width, outside_depth, outside_height], r=drawer_wall, sidesonly=true, center=true);
+    module Body() {
+        roundedCube(size=[outside.x, outside.y, outside.z], r=drawer_wall, sidesonly=true, center=true);
+    }
 
     module SquareCutoutRear() {
-        translate([0, -1 * inside_depth / 4, 0])
-            roundedCube(size=[inside_width, inside_depth / 2, inside_height], r=drawer_wall, sidesonly=true, center=true);
+        translate([0, -1 * inside.y / 4, 0])
+            roundedCube(size=[inside.x, inside.y / 2, inside.z], r=drawer_wall, sidesonly=true, center=true);
     }
 
     module SquareCutoutFront() {
-        translate([0, inside_depth / 4, 0])
-            roundedCube(size=[inside_width, inside_depth / 2, inside_height], r=drawer_wall, sidesonly=true, center=true);
+        translate([0, inside.y / 4, 0])
+            roundedCube(size=[inside.x, inside.y / 2, inside.z], r=drawer_wall, sidesonly=true, center=true);
     }
 
     module SquareCutout() {
@@ -51,9 +56,9 @@ module Drawer(height, drawer_wall=1, u_width=1, u_depth=2, fill_type=SQUARE_CUT)
     module ScoopCutout() {
         module Scoop() {
             intersection() {
-                translate([0, (inside_depth / 2) - inside_height, inside_height / 2])
+                translate([0, (inside.y / 2) - inside.z, inside.z / 2])
                     rotate([0, 90, 0])
-                        cylinder(h=inside_width, r=inside_height, center=true);
+                        cylinder(h=inside.x, r=inside.z, center=true);
                 SquareCutoutFront();
             }
         }
@@ -66,18 +71,18 @@ module Drawer(height, drawer_wall=1, u_width=1, u_depth=2, fill_type=SQUARE_CUT)
     module Handle() {
         handle_lip = 8;
         handle_support_width = 10;
-        edge = [outside_width / 2 - drawer_wall, drawer_wall * 2, outside_height / 2];
+        edge = [outside.x / 2 - drawer_wall, drawer_wall * 2, outside.z / 2];
 
-        module TopLeft() translate([edge[0], 0, edge[2]]) sphere(r=drawer_wall);
-        module TopRight() translate([-1 * edge[0], 0, edge[2]]) sphere(r=drawer_wall);
-        module UpperLipLeft() translate([edge[0], edge[1], edge[2]]) sphere(r=drawer_wall);
-        module UpperLipRight() translate([-1 * edge[0], edge[1], edge[2]]) sphere(r=drawer_wall);
-        module BottomLeft() translate([edge[0], 0, (-1 * edge[2]) + drawer_wall]) sphere(r=drawer_wall);
-        module BottomRight() translate([-1 * edge[0], 0, (-1 * edge[2]) + drawer_wall]) sphere(r=drawer_wall);
-        module OuterLipLeft() translate([edge[0], handle_lip, 0]) sphere(r=drawer_wall);
-        module OuterLipRight() translate([-1 * edge[0], handle_lip, 0]) sphere(r=drawer_wall);
-        module InnerLipLeft() translate([edge[0] - handle_support_width, 0, 0]) sphere(r=drawer_wall);
-        module InnerLipRight() translate([-1  * (edge[0] - handle_support_width), 0, 0]) sphere(r=drawer_wall);
+        module TopLeft() translate([edge.x, 0, edge.z]) sphere(r=drawer_wall);
+        module TopRight() translate([-1 * edge.x, 0, edge.z]) sphere(r=drawer_wall);
+        module UpperLipLeft() translate([edge.x, edge.y, edge.z]) sphere(r=drawer_wall);
+        module UpperLipRight() translate([-1 * edge.x, edge.y, edge.z]) sphere(r=drawer_wall);
+        module BottomLeft() translate([edge.x, 0, (-1 * edge.z) + drawer_wall]) sphere(r=drawer_wall);
+        module BottomRight() translate([-1 * edge.x, 0, (-1 * edge.z) + drawer_wall]) sphere(r=drawer_wall);
+        module OuterLipLeft() translate([edge.x, handle_lip, 0]) sphere(r=drawer_wall);
+        module OuterLipRight() translate([-1 * edge.x, handle_lip, 0]) sphere(r=drawer_wall);
+        module InnerLipLeft() translate([edge.x - handle_support_width, 0, 0]) sphere(r=drawer_wall);
+        module InnerLipRight() translate([-1  * (edge.x - handle_support_width), 0, 0]) sphere(r=drawer_wall);
 
         module LeftBase() {
             hull() {
@@ -116,7 +121,7 @@ module Drawer(height, drawer_wall=1, u_width=1, u_depth=2, fill_type=SQUARE_CUT)
     difference() {
         union() {
             Body();
-            translate([0, outside_depth / 2 - drawer_wall, 0])
+            translate([0, outside.y / 2 - drawer_wall, 0])
                 Handle();
         }
         translate([0, 0, (drawer_wall / 2)]) {
@@ -124,7 +129,7 @@ module Drawer(height, drawer_wall=1, u_width=1, u_depth=2, fill_type=SQUARE_CUT)
             else if (fill_type == SCOOP_CUT) ScoopCutout();
         }
         // slice off everything above the top
-        translate([0, 0, (outside_height / 2) + (drawer_wall / 2) + 0.001])
-            cube([outside_width * 2, outside_depth *2, drawer_wall + 0.003], center=true);
+        translate([0, 0, (outside.z / 2) + (drawer_wall / 2) + 0.001])
+            cube([outside.x * 2, outside.y *2, drawer_wall + 0.003], center=true);
     }
 }
