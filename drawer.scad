@@ -148,6 +148,16 @@ module Drawer(dimensions, drawer_wall=1, fill_type=SQUARE_CUT) {
         Face();
     }
 
+    // block out the edges of the side walls to slice off any overhangs
+    module SideWallSlice() {
+        // add a tiny slice to intersect with the wall and avoid rendering artifacts
+        buffer = 0.00005;
+        translate([(outside.x / 2) + 5 - buffer, 0, 0])
+            cube([10, outside.y * 2, outside.z * 2], center=true);
+        translate([-1 * (outside.x / 2) - 5 + buffer, 0, 0])
+            cube([10, outside.y * 2, outside.z * 2], center=true);
+    }
+
     difference() {
         union() {
             Body();
@@ -158,6 +168,7 @@ module Drawer(dimensions, drawer_wall=1, fill_type=SQUARE_CUT) {
             if (fill_type == SQUARE_CUT) SquareCutout();
             else if (fill_type == SCOOP_CUT) ScoopCutout();
         }
+        SideWallSlice();
         // slice off everything above the top
         translate([0, 0, (outside.z / 2) + (drawer_wall / 2) + 0.001])
             cube([outside.x * 2, outside.y *2, drawer_wall + 0.003], center=true);
