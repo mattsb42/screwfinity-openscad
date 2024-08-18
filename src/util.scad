@@ -27,3 +27,18 @@ module Lip(footprint, cross_section, center=false) {
         }
     }
 }
+
+/**
+ * Sum all members of a vector.
+ */
+function sum_vector(vector, index=0, running_sum=0) =
+    index < len(vector)
+    ? sum_vector(vector, index + 1, running_sum + vector[index])
+    : running_sum;
+
+/**
+ * Slice a vector up to end_index.
+ */
+function sub_vector(vector, end_index) = end_index <= 0 ? [] : [
+    for (i = [0: end_index - 1]) if (i < len(vector)) vector[i]
+];
