@@ -7,6 +7,16 @@ function drawer_options (unit_width, unit_depth, height) = [unit_width, unit_dep
 
 module Drawer(dimensions, drawer_wall=1, fill_type=SQUARE_CUT) {
 
+    minimum_interior_width = 0.1;
+
+    assert(
+        dimensions.x > 0 && dimensions.y > 0 && dimensions.z > 0,
+        str(
+            "ERROR: All dimensions MUST be positive. ",
+            dimensions
+        )
+    )
+
     assert(
         dimensions.y % 1 == 0,
         str(
@@ -34,6 +44,18 @@ module Drawer(dimensions, drawer_wall=1, fill_type=SQUARE_CUT) {
         outside.y - (2 * drawer_wall),
         outside.z - drawer_wall
     ];
+
+    assert(
+        inside.x >= minimum_interior_width,
+        str(
+            "ERROR: Drawer width is too narrow.",
+            " With unit width ", dimension.x,
+            " and drawer wall thickness ", drawer_wall,
+            " the drawer interior width is ", inside.x, ".",
+            " Recommend reducing drawer width to no more than ",
+            (outside.x - minimum_interior_width) / 2
+        )
+    );
 
     module Body() {
         difference() {
