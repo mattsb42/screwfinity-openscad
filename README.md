@@ -1,26 +1,23 @@
-I recently discovered the phenomenal
-[Screwfinity Unit by ZombieHedgehog](https://thangs.com/designer/ZombieHedgehog/3d-model/Screwfinity%20Unit%202U%20Medium%20-%20The%20Gridfinity%20Storage%20Unit-1027305),
-and have loved it for starting to organize
-my small screws and similar items.
-I've been pretty happy with it as-is,
-but when I found the
-[4U wide variant by Myrmecodia](https://thangs.com/designer/Myrmecodia/3d-model/Screwfinity%20Medium%20Wide%204U%20drawer%20set-1097859),
-I realized what was missing. :)
+# Screwfinity Rebuilt in OpenSCAD
 
-While both of these projects are great,
-every new variant,
-be that drawer height or depth,
-or different drawer cabinets,
-needed manual attention to generate and mutate.
-It was also kind of annoying to have to print and glue
-the [inserts](https://thangs.com/designer/Fresh%20Brewed%20Design/3d-model/Screwfinity%20Grid%20Insert-1052789)
-for the drawer cabinet tops,
-which very reasonable are not included by default.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-I'd also been looking for a good project to learn [OpenSCAD](http://openscad.org/).
+Drawing inspiration (and modules) from
+[Gridfinity Rebuilt in OpenSCAD](https://github.com/kennetek/gridfinity-rebuilt-openscad),
+this is a port of
+[Screwfinity Unit by ZombieHedgehog](https://thangs.com/designer/ZombieHedgehog/3d-model/Screwfinity%20Unit%202U%20Medium%20-%20The%20Gridfinity%20Storage%20Unit-1027305)
+in OpenSCAD.
 
-The goal of this project is to have fully parameterized drawers and cabinets,
-with the option to enable or disable
-cabinet-top grids,
-drawer labels,
-and other features as I find them.
+The deeper I got into Screwfinity,
+the more I found edge cases where the existing set of models
+didn't _quite_ meet what I wanted,
+or just took a lot of ground-up work to make new variants.
+I had been looking for a project to use to learn OpenSCAD,
+and this seemed like something that would be perfect for
+algorithmic definition.
+
+My goal is for this project to be fully compatible with the original Screwfinity models,
+as well as offering several additional features that the original does not offer,
+such as heterogeneous cabinets and alternative mounting options.
+
+See [docs](./docs/) and [examples](./examples/) for usage instructions.
