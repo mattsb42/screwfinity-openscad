@@ -80,3 +80,54 @@ Cabinet(
 ### Generates
 
 ![](./images/cabinet_2x1x3_2-0.75-1.png)
+
+## Cards
+
+Let's say I wanted to store
+my business cards in a Screwfinity cabinet.
+Shh, don't ask questions.
+
+### Code
+
+```openscad
+Cabinet(
+    gridfinity_footprint=[2, 3],
+    grid=[
+        drawer_slot_options(unit_width=0.5, height=50),
+    ],
+    top=surface_options(style=GRIDFINITY_BASEPLATE_MAGNET_TOP),
+    base=surface_options(style=GRIDFINITY_BASE)
+);
+```
+
+### Generates
+
+![](./images/cabinet_2x3x1_0.5.png)
+
+## Overboard
+
+Ok, we've done some sensible things,
+some probably silly things.
+Let's say you wanted something...much more specific.
+IDK, maybe there's a good reason,
+I won't judge.
+
+### Code
+
+```autoscad
+Cabinet(
+    gridfinity_footprint=[5, 3],
+    grid=[
+        drawer_slot_options(unit_width=.75, height=SMALL),
+        drawer_slot_options(unit_width=5, height=MEDIUM),
+        drawer_slot_options(unit_width=2, height=10),
+        drawer_slot_options(unit_width=0.5, height=LARGE),
+    ],
+    top=surface_options(style=GRIDFINITY_BASEPLATE_MAGNET_TOP),
+    base=surface_options(style=GRIDFINITY_BASE)
+);
+```
+
+### Generates
+
+![](./images/cabinet_5x3x4_varied.png)
