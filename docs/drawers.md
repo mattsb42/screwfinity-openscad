@@ -31,7 +31,8 @@ and converts them to the form that `Drawer` needs.
 - **unit_width** :
   The width in GridU.
   This can be any positive value you like,
-  but I recommend not going smaller than 0.5.
+  but I recommend not going smaller than 0.2
+  with the default drawer wall thickness.
   Yes, [cabinets](./cabinets.md) can generate
   fractional drawer slots. ;)
 - **unit_depth** :
