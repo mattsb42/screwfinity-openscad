@@ -1,6 +1,6 @@
 [submodule "MCAD"]
-	path = src/MCAD
+	path = MCAD
 	url = git@github.com:openscad/MCAD.git
 [submodule "src/gridfinity-rebuilt-openscad"]
-	path = src/gridfinity-rebuilt-openscad
+	path = gridfinity-rebuilt-openscad
 	url = git@github.com:kennetek/gridfinity-rebuilt-openscad.git
