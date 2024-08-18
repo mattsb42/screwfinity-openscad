@@ -3,13 +3,15 @@ include <./options.scad>;
 use <./util.scad>;
 use <./MCAD/boxes.scad>;
 
-module Drawer(height, drawer_wall=1, u_width=1, u_depth=2, fill_type=SQUARE_CUT) {
+function drawer_options (unit_width, unit_depth, height) = [unit_width, unit_depth, height];
+
+module Drawer(dimensions, drawer_wall=1, fill_type=SQUARE_CUT) {
 
     assert(
-        u_depth % 1 == 0,
+        dimensions.y % 1 == 0,
         str(
-            "ERROR: Invalid u_depth value ",
-            u_depth,
+            "ERROR: Invalid unit_depth value ",
+            dimensions.y,
             " must be an integer."
         )
     );
@@ -23,9 +25,9 @@ module Drawer(height, drawer_wall=1, u_width=1, u_depth=2, fill_type=SQUARE_CUT)
     );
 
     outside = [
-        (u_width * GRIDFINITY_GRID_LENGTH) - GU_TO_DU - (DRAWER_TOLERANCE * 2),
-        (u_depth * GRIDFINITY_GRID_LENGTH) - CABINET_REAR_WALL - DRAWER_STOP,
-        height,
+        (dimensions.x * GRIDFINITY_GRID_LENGTH) - GU_TO_DU - (DRAWER_TOLERANCE * 2),
+        (dimensions.y * GRIDFINITY_GRID_LENGTH) - CABINET_REAR_WALL - DRAWER_STOP,
+        dimensions.z,
     ];
     inside = [
         outside.x - (2 * drawer_wall),
