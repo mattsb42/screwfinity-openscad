@@ -6,9 +6,11 @@ use <./gridfinity-rebuilt-openscad/gridfinity-rebuilt-holes.scad>;
 include <./gridfinity-rebuilt-openscad/standard.scad>;
 
 
-function drawer_slot_options (drawer_u_width, drawer_height) = [drawer_u_width, 0, drawer_height];
+function drawer_slot_options (unit_width, height) = [unit_width, 0, height];
 
 function grid_expand (drawer, rows) = [for (i = [0:rows -1]) drawer];
+
+function surface_options (style, hole_options=bundle_hole_options(magnet_hole=true)) = [style, hole_options];
 
 drawer = ["width", "UNUSED_DEPTH", "height"];
 grid = [drawer, drawer, drawer];
@@ -18,12 +20,15 @@ shell = ["x", "y", grid];
 module Cabinet(
     gridfinity_footprint,
     grid,
-    base_style=GRIDFINITY_BASE,
-    hole_options=bundle_hole_options(magnet_hole=true),
-    top_style=LIP_TOP,
+    base=surface_options(style=GRIDFINITY_BASE),
+    top=surface_options(style=GRIDFINITY_STACKING_TOP),
 ) {
     outer_wall = 2.0;
     inner_wall = 1.0;
+    outer_footprint = [
+        gridfinity_footprint.x * GRIDFINITY_GRID_LENGTH,
+        gridfinity_footprint.y * GRIDFINITY_GRID_LENGTH
+    ];
 
     assert(
         gridfinity_footprint.x % 1 == 0,
@@ -55,18 +60,18 @@ module Cabinet(
     }
 
     assert(
-        base_style == NO_BASE || base_style == GRIDFINITY_BASE,
+        base[0] == NO_BASE || base[0] == GRIDFINITY_BASE,
         str(
             "ERROR: Invalid base style: ",
-            base_style
+            base[0]
         )
     );
 
     assert(
-        top_style == NO_TOP || top_style == LIP_TOP || top_style == GRIDFINITY_STACKING_TOP,
+        top[0] == NO_TOP || top[0] == LIP_TOP || top[0] == GRIDFINITY_STACKING_TOP,
         str(
             "ERROR: Invalid top style: ",
-            top_style
+            top[0]
         )
     );
 
@@ -78,23 +83,23 @@ module Cabinet(
         // Height of drawer stop.
         stop_height = 1;
 
-        base = [
+        stop_base = [
             // inner edge
             [[-1 * stop_width / 2, DRAWER_STOP / 2, 0], [stop_width / 2, DRAWER_STOP / 2, 0]],
             // outer edge
             [[-1 * stop_width / 2, -1 * DRAWER_STOP / 2, 0], [stop_width / 2, -1 * DRAWER_STOP / 2, 0]],
         ];
-        peak = [
+        stop_peak = [
             [-1 * (stop_width / 2 - slope_run), 0, stop_height], [stop_width / 2 - slope_run, 0, stop_height],
         ];
         polyhedron(
             points=[
-                base[0].x,
-                base[0].y,
-                base[1].x,
-                base[1].y,
-                peak.x,
-                peak.y,
+                stop_base[0].x,
+                stop_base[0].y,
+                stop_base[1].x,
+                stop_base[1].y,
+                stop_peak.x,
+                stop_peak.y,
             ],
             faces=[
                 // bottom face
@@ -242,15 +247,17 @@ module Cabinet(
     module CabinetBody() {
         echo(str("grid: ", grid));
         // top plate
+        color("pink")
         translate([0, 0, top_of_shell() - (outer_wall / 2)])
-            cube([gridfinity_footprint.x, gridfinity_footprint.y, outer_wall], center=true);
+            cube([outer_footprint.x, outer_footprint.y, outer_wall], center=true);
         for (row = [0: len(grid) - 1]) {
             translate([0, 0, -1 * row_z_offset(grid, row)])
                 CabinetRow(row_drawer_height=grid[row].z, row_drawer_width=grid[row].x);
         }
         // bottom plate
+        color("pink")
         translate([0, 0, bottom_of_shell() + (outer_wall / 2)])
-            cube([gridfinity_footprint.x, gridfinity_footprint.y, outer_wall], center=true);
+            cube([outer_footprint.x, outer_footprint.y, outer_wall], center=true);
     }
 
     module GridFinityBase () {
@@ -262,12 +269,12 @@ module Cabinet(
                 l=GRIDFINITY_GRID_LENGTH,
                 dx=0,
                 dy=0,
-                hole_options=hole_options
+                hole_options=base[1]
             );
     }
 
     module CabinetBase() {
-        if(base_style == GRIDFINITY_BASE) GridFinityBase();
+        if(base[0] == GRIDFINITY_BASE) GridFinityBase();
     }
 
     module LipTop() {
@@ -277,14 +284,14 @@ module Cabinet(
             outer_buffer_width = 0.25;
             color("blue")
             difference() {
-                cube([gridfinity_footprint.x, gridfinity_footprint.y, cross_section.y], center=true);
+                cube([outer_footprint.x, outer_footprint.y, cross_section.y], center=true);
                 // make the cut-out cube taller to remove render preview artifacts
-                cube([gridfinity_footprint.x - outer_buffer_width, gridfinity_footprint.y - outer_buffer_width, cross_section.y + 1], center=true);
+                cube([outer_footprint.x - outer_buffer_width, outer_footprint.y - outer_buffer_width, cross_section.y + 1], center=true);
             }
             // add the lip
             color("green")
                 Lip(
-                    footprint=[gridfinity_footprint.x - outer_buffer_width, gridfinity_footprint.y - outer_buffer_width],
+                    footprint=[outer_footprint.x - outer_buffer_width, outer_footprint.y - outer_buffer_width],
                     cross_section=cross_section,
                     center=true
                 );
@@ -298,15 +305,15 @@ module Cabinet(
         translate([0, 0, top_of_shell() - actual_offset]) {
             difference() {
                 gridfinityInit(gx = gridfinity_footprint.x, gy = gridfinity_footprint.y, h = 1);
-                translate([-1 * gridfinity_footprint.x / 2, -1 * gridfinity_footprint.y / 2, 0])
-                    cube([gridfinity_footprint.x, gridfinity_footprint.y, actual_offset]);
+                translate([-1 * outer_footprint.x / 2, -1 * outer_footprint.y / 2, 0])
+                    cube([outer_footprint.x, outer_footprint.y, actual_offset]);
             }
         }
     }
 
     module CabinetTop() {
-        if(top_style == LIP_TOP) LipTop();
-        else if(top_style == GRIDFINITY_STACKING_TOP) GridFinityStackingLip();
+        if(top[0] == LIP_TOP) LipTop();
+        else if(top[0] == GRIDFINITY_STACKING_TOP) GridFinityStackingLip();
     }
 
     CabinetTop();
