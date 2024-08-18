@@ -49,7 +49,7 @@ module Drawer(dimensions, drawer_wall=1, fill_type=SQUARE_CUT) {
         inside.x >= minimum_interior_width,
         str(
             "ERROR: Drawer width is too narrow.",
-            " With unit width ", dimension.x,
+            " With unit width ", dimensions.x,
             " and drawer wall thickness ", drawer_wall,
             " the drawer interior width is ", inside.x, ".",
             " Recommend reducing drawer width to no more than ",
