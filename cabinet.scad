@@ -7,16 +7,19 @@ use <./gridfinity-rebuilt-openscad/gridfinity-rebuilt-baseplate.scad>;
 include <./gridfinity-rebuilt-openscad/standard.scad>;
 
 
+default_hole_options = bundle_hole_options(
+    magnet_hole=true,
+    crush_ribs=true
+);
+
 function drawer_slot_options (unit_width, height) = [unit_width, 0, height];
 
 function grid_expand (drawer, rows) = [for (i = [0:rows -1]) drawer];
 
-function surface_options (style, hole_options=bundle_hole_options(magnet_hole=true)) = [style, hole_options];
-
-drawer = ["width", "UNUSED_DEPTH", "height"];
-grid = [drawer, drawer, drawer];
-shell = ["x", "y", grid];
-
+function surface_options (
+    style,
+    hole_options=default_hole_options
+) = [style, hole_options];
 
 module Cabinet(
     gridfinity_footprint,
@@ -325,7 +328,7 @@ module Cabinet(
                     length=GRIDFINITY_GRID_LENGTH,
                     min_size_mm = [0,0],
                     sp=2,
-                    hole_options=bundle_hole_options(magnet_hole=true),
+                    hole_options=default_hole_options,
                     sh=0
                 );
                 translate([-1 * outer_footprint.x / 2 - 1, -1 * outer_footprint.y / 2 - 1, -1])
