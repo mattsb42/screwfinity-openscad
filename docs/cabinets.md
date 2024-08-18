@@ -104,9 +104,11 @@ to generate the configuration that you want.
     Useful if you want to integrate this model
     into something else
     or want to design your own base.
+    ![](./images/base_no-base.png)
   - `GRIDFINITY_BASE` :
     Gridfinity base, courtesy of
     [Gridfinity Rebuilt](https://github.com/kennetek/gridfinity-rebuilt-openscad).
+    ![](./images/base_gridfinity-base.png)
 - `hole_options` :
   Options passed to the Gridfinity Rebuilt generator
   if you selected `GRIDFINITY_BASE` for `style`.
@@ -129,10 +131,19 @@ to generate the configuration that you want.
     Useful if you want to integrate this model
     into something else
     or want to design your own top.
+    ![](./images/top_no-top.png)
   - `GRIDFINITY_STACKING_TOP` :
     Stacking Gridfinity top, courtesy of
     [Gridfinity Rebuilt](https://github.com/kennetek/gridfinity-rebuilt-openscad/blob/main/docs/bins.md#gridfinityinit)
     using the "regular lip" style.
+    ![](./images/top_gridfinity-stacking.png)
+  - `GRIDFINITY_BASEPLATE_MAGNET_TOP` :
+    Gridfinity magnet baseplate.
+    Great if you want a secure connection
+    while stacking Screwfinity cabinets
+    (or any other Gridfinity stuff)
+    on top of your cabinets.
+    ![](./images/top_gridfinity-magnet.png)
   - `LIP_TOP` :
     Emulates the original Screwfinity top.
     I don't personally recommend this.
@@ -146,3 +157,10 @@ to generate the configuration that you want.
     https://github.com/mattsb42/screwfinity-rebuilt-openscad/issues/16),
     which isn't great if you like to
     put drawers on top of the cabinet.
+    ![](./images/top_screwfinity-lip.png)
+- `hole_options` :
+  Does nothing.
+  I'm conflicted on whether passing `hole_options` through
+  makes sense here.
+  For now it does not pass through,
+  and the holes are not configurable.

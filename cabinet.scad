@@ -3,6 +3,7 @@ include <./options.scad>;
 use <./util.scad>;
 use <./gridfinity-rebuilt-openscad/gridfinity-rebuilt-utility.scad>;
 use <./gridfinity-rebuilt-openscad/gridfinity-rebuilt-holes.scad>;
+use <./gridfinity-rebuilt-openscad/gridfinity-rebuilt-baseplate.scad>;
 include <./gridfinity-rebuilt-openscad/standard.scad>;
 
 
@@ -68,7 +69,10 @@ module Cabinet(
     );
 
     assert(
-        top[0] == NO_TOP || top[0] == LIP_TOP || top[0] == GRIDFINITY_STACKING_TOP,
+        top[0] == NO_TOP
+        || top[0] == LIP_TOP
+        || top[0] == GRIDFINITY_STACKING_TOP
+        || top[0] == GRIDFINITY_BASEPLATE_MAGNET_TOP,
         str(
             "ERROR: Invalid top style: ",
             top[0]
@@ -311,9 +315,29 @@ module Cabinet(
         }
     }
 
+    module GridFinityMagnetBaseplateLip() {
+        // offset one micrometer above the bottom of the magnet hole
+        offset = 4.361;
+        translate([0, 0, top_of_shell() - offset]) {
+            difference() {
+                gridfinityBaseplate(
+                    grid_size_bases=gridfinity_footprint,
+                    length=GRIDFINITY_GRID_LENGTH,
+                    min_size_mm = [0,0],
+                    sp=2,
+                    hole_options=bundle_hole_options(magnet_hole=true),
+                    sh=0
+                );
+                translate([-1 * outer_footprint.x / 2 - 1, -1 * outer_footprint.y / 2 - 1, -1])
+                    cube([outer_footprint.x + 2, outer_footprint.y + 2, offset + 1]);
+            }
+        }
+    }
+
     module CabinetTop() {
         if(top[0] == LIP_TOP) LipTop();
         else if(top[0] == GRIDFINITY_STACKING_TOP) GridFinityStackingLip();
+        else if(top[0] == GRIDFINITY_BASEPLATE_MAGNET_TOP) GridFinityMagnetBaseplateLip();
     }
 
     CabinetTop();
