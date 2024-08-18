@@ -5,12 +5,16 @@ use <./gridfinity-rebuilt-openscad/gridfinity-rebuilt-utility.scad>;
 use <./gridfinity-rebuilt-openscad/gridfinity-rebuilt-holes.scad>;
 include <./gridfinity-rebuilt-openscad/standard.scad>;
 
-function shell_options (width, depth) = [
-];
+
+function drawer_slot_options (drawer_u_width, drawer_height) = [drawer_u_width, drawer_height];
 
 function row_options () = [];
 
-function drawer_slot_options (height, width, count) = [];
+drawer = ["width", "height"];
+row = [[drawer, drawer, drawer]];
+grid = [row, row, row];
+shell = ["x", "y", grid];
+
 
 module Cabinet(
     drawer_height,
@@ -199,24 +203,24 @@ module Cabinet(
         );
     }
 
-    module DrawerSlotNegative() {
+    module DrawerSlotNegative(dimensions) {
         difference(){
-            cube(drawer_slot_inner, center=true);
+            cube(dimensions, center=true);
             translate([
                 0,
-                (drawer_slot_inner.y / 2) - (DRAWER_STOP / 2),
-                -1 * drawer_slot_inner.z / 2
+                (dimensions.y / 2) - (DRAWER_STOP / 2),
+                -1 * dimensions.z / 2
             ])
                 DrawerStop();
         }
     }
 
-    module SolidCabinet() {
+    module SolidCabinet(dimensions) {
         difference() {
-            cube(shell_outer, center=true);
+            cube(dimensions, center=true);
             // trim off the front film
-            translate([0, (shell_outer.y / 2) + 0.001, 0])
-                cube([shell_outer.x, 0.003, shell_outer.z], center=true);
+            translate([0, (dimensions.y / 2) + 0.001, 0])
+                cube([dimensions.x, 0.003, dimensions.z], center=true);
         }
     }
 
@@ -235,22 +239,133 @@ module Cabinet(
         )
             [column_position, 0, row_position];
 
+    function row_wall_buffer (outer_width, slot_width, column_count) = 
+        (
+            (outer_width - (outer_wall * 2))
+            - ((slot_width + inner_wall) * column_count)
+        )
+        / (column_count + 1);
+
+    function row_traverse(row_inner, slot_outer, column) =
+        let(origin=[
+            // move to the left edge
+            (row_inner.x / 2)
+                // move to the center of the first drawer
+                - (slot_outer.x / 2),
+            // move the origin forward to align the cutout with the front of the cabinet
+            CABINET_REAR_WALL / 2,
+            (row_inner.z / 2) - (slot_outer.z / 2)
+        ])
+            [
+                origin.x - (slot_outer.x * column),
+                origin.y,
+                origin.z,
+            ];
+
+    /**
+     */
+    module CabinetRow(row_drawer_height, row_drawer_width) {
+        // Inner dimensions of a drawer slot cutout.
+        echo(str("Creating row for drawers of width ", row_drawer_width, " and height ", row_drawer_height));
+        slot_inner = [
+            (row_drawer_width * GRIDFINITY_GRID_LENGTH) - GU_TO_DU,
+            (u_depth * GRIDFINITY_GRID_LENGTH) - CABINET_REAR_WALL,
+            row_drawer_height + (2 * DRAWER_TOLERANCE),
+        ];
+        outer_perimeter = [
+            u_width * GRIDFINITY_GRID_LENGTH,
+            u_depth * GRIDFINITY_GRID_LENGTH,
+        ];
+        minimum_slot_outer_width = slot_inner.x + inner_wall;
+        row_columns = floor(outer_perimeter.x / minimum_slot_outer_width);
+        
+        // Extra width to add to each wall to center the drawer slots in a row.
+        row_buffer = row_wall_buffer(
+            outer_width=outer_perimeter.x,
+            slot_width=slot_inner.x,
+            column_count=row_columns
+        );
+
+        // "Outer" dimensions of a virtual drawer slot,
+        //  with the necessary boundaries around the cutout.
+        slot_outer = [
+            // Spread the extra space evenly across all walls.
+            minimum_slot_outer_width + row_buffer,
+            // The drawer slot "outer" dimension is the same as the inner.
+            slot_inner.y,
+            slot_inner.z + inner_wall,
+        ];
+        // Virtual "inner" dimensions of the row.
+        // Used to align and center the slot cutouts.
+        row_inner = [
+            outer_perimeter.x - (outer_wall * 2) - row_buffer,
+            slot_outer.y,
+            slot_outer.z,
+        ];
+        row_outer = [
+            u_width * GRIDFINITY_GRID_LENGTH,
+            u_depth * GRIDFINITY_GRID_LENGTH,
+            row_inner.z,
+        ];
+
+        translate([0, 0, -1 * row_outer.z / 2])
+        difference() {
+            color("grey")
+                SolidCabinet(row_outer);
+            for (column = [0: row_columns - 1])
+                translate(row_traverse(row_inner, slot_outer, column))
+                    DrawerSlotNegative(slot_inner);
+        }
+    }
+
+    function sum_vector(vector, index=0, running_sum=0) =
+        index < len(vector)
+        ? sum_vector(vector, index + 1, running_sum + vector[index])
+        : running_sum;
+
+    function sub_vector(vector, end_index) = end_index <= 0 ? [] : [
+        for (i = [0: end_index - 1]) if (i < len(vector)) vector[i]
+    ];
+
+    function row_y_offset(rows, row_index) =
+        let(
+            drawer_height_sum = sum_vector(sub_vector([for (r = rows) r.y], row_index)),
+            slot_inner_sum = drawer_height_sum + (row_index * (2 * DRAWER_TOLERANCE)),
+            slot_outer_sum = slot_inner_sum + (row_index * inner_wall)
+        )
+            slot_outer_sum;
+
+    function bottom_of_shell (rows) = -1 * row_y_offset(rows, len(rows));
+
+    module CabinetBody2(rows) {
+        // top plate
+        translate([0, 0, outer_wall / 2])
+            cube([shell_outer.x, shell_outer.y, outer_wall], center=true);
+        for (row = [0: len(rows) - 1]) {
+            translate([0, 0, -1 * row_y_offset(rows, row)])
+                CabinetRow(row_drawer_height=rows[row].y, row_drawer_width=rows[row].x);
+        }
+        // bottom plate
+        translate([0, 0, bottom_of_shell(rows) - (outer_wall / 2)])
+            cube([shell_outer.x, shell_outer.y, outer_wall], center=true);
+    }
+
     module CabinetBody() {
         difference() {
             color("grey")
-                SolidCabinet();
+                SolidCabinet(shell_outer);
             translate([0, CABINET_REAR_WALL / 2, 0])
-                for (column = [0: drawer_columns - 1])
-                    for (row = [0: drawer_rows - 1]){
+                for (row = [0: drawer_rows - 1])
+                    for (column = [0: drawer_columns - 1]){
                         echo(str("column ", column, ", row ", row, " at position ", traverse(column, row)));
                         translate(traverse(column, row))
-                            DrawerSlotNegative();
+                            DrawerSlotNegative(drawer_slot_inner);
                     }
         }
     }
 
-    module GridFinityBase () {
-        translate([0, 0, (-1 * shell_outer.z / 2) - 5]) 
+    module GridFinityBase (shell_base) {
+        translate([0, 0, shell_base - 5]) 
         color("red")
             gridfinityBase(
                 gx=u_width,
@@ -262,13 +377,13 @@ module Cabinet(
             );
     }
 
-    module CabinetBase() {
-        if(base_style == GRIDFINITY_BASE) GridFinityBase();
+    module CabinetBase(shell_base) {
+        if(base_style == GRIDFINITY_BASE) GridFinityBase(shell_base);
     }
 
-    module LipTop() {
+    module LipTop(shell_top) {
         cross_section = [2, 4];
-        translate([0, 0, (shell_outer.z / 2) + (cross_section.y / 2)]) {
+        translate([0, 0, shell_top + (cross_section.y / 2)]) {
             // add a rim around the lip; the lip by itself is too thin at the edge
             outer_buffer_width = 0.25;
             color("blue")
@@ -287,11 +402,11 @@ module Cabinet(
         }
     }
 
-    module GridFinityStackingLip() {
+    module GridFinityStackingLip(shell_top) {
         // There's an extra 1mm offset somewhere (haven't pinned down where it comes from)
         //  and add an extra micrometer to remove render artifacts.
         actual_offset = h_base + 1.001;
-        translate([0, 0, (shell_outer.z/2) - actual_offset]) {
+        translate([0, 0, shell_top - actual_offset]) {
             difference() {
                 gridfinityInit(gx = u_width, gy = u_depth, h = 1);
                 translate([-1 * shell_outer.x / 2, -1 * shell_outer.y / 2, 0])
@@ -300,12 +415,13 @@ module Cabinet(
         }
     }
 
-    module CabinetTop() {
-        if(top_style == LIP_TOP) LipTop();
-        else if(top_style == GRIDFINITY_STACKING_TOP) GridFinityStackingLip();
+    module CabinetTop(shell_top) {
+        if(top_style == LIP_TOP) LipTop(shell_top);
+        else if(top_style == GRIDFINITY_STACKING_TOP) GridFinityStackingLip(shell_top);
     }
 
-    CabinetTop();
-    CabinetBody();
-    CabinetBase();
+    rows = [[1, 20], [1, 30], [1, 40]];
+    CabinetTop(shell_top=outer_wall);
+    CabinetBody2(rows);
+    CabinetBase(shell_base=bottom_of_shell(rows) - outer_wall);
 }
