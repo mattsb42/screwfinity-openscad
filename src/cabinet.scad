@@ -16,7 +16,6 @@ shell = ["x", "y", grid];
 
 
 module Cabinet(
-    drawer_dimensions,
     gridfinity_footprint,
     grid,
     base_style=GRIDFINITY_BASE,
@@ -44,16 +43,18 @@ module Cabinet(
         )
     );
 
-    assert(
-        gridfinity_footprint.x % drawer_dimensions.x == 0,
-        str(
-            "ERROR: Invalid drawer and cabinet width selection. ",
-            "Cabinet unit width ",
-            gridfinity_footprint.x,
-            " is not evenly divisible by drawer unit width ",
-            drawer_dimensions.x
-        )
-    );
+    for (row = grid) {
+        assert(
+            gridfinity_footprint.x % row.x == 0,
+            str(
+                "ERROR: Invalid drawer and cabinet width selection. ",
+                "Cabinet unit width ",
+                gridfinity_footprint.x,
+                " is not evenly divisible by drawer unit width ",
+                row.x
+            )
+        );
+    }
 
     assert(
         base_style == NO_BASE || base_style == GRIDFINITY_BASE,
