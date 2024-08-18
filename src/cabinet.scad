@@ -45,13 +45,11 @@ module Cabinet(
 
     for (row = grid) {
         assert(
-            gridfinity_footprint.x % row.x == 0,
+            row.x <= gridfinity_footprint.x,
             str(
                 "ERROR: Invalid drawer and cabinet width selection. ",
-                "Cabinet unit width ",
-                gridfinity_footprint.x,
-                " is not evenly divisible by drawer unit width ",
-                row.x
+                "Drawer unit width ", row.x,
+                " is wider than cabinet grid unit width ", gridfinity_footprint.x
             )
         );
     }
