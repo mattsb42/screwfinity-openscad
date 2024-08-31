@@ -28,5 +28,6 @@ jobs:
             - uses: tiagovrtr/actions-pipenv@42dd846ed39aab687919c45dd5e80e448f0da503
               with:
                 pipenv-version: ${{ matrix.pipenv-version }}
+            - run: pipenv install
             - name: "run tests"
               run: ./build.sh
