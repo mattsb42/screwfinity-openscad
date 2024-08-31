@@ -1,0 +1,32 @@
+name: "CI"
+on:
+    - pull_request
+    - push
+
+jobs:
+    ci:
+        strategy:
+            fail-fast: true
+            matrix:
+                openscad-version: ["2021.01"]
+                python-version: ["3.12.5"]
+                pipenv-version: ["2024.0.1"]
+                os: ["ubuntu-latest"]
+        runs-on: ${{ matrix.os }}
+        steps:
+            - uses: actions/checkout@4.1.7
+              with:
+                submodules: true
+            - uses: ConorMacBride/install-package@3e7ad059e07782ee54fa35f827df52aae0626f30
+              with:
+                apt: openscad=${{ matrix.openscad-version }}
+                brew: openscad=${{ matrix.openscad-version }}
+            - uses: actions/setup-python@5.2.0
+              with:
+                python-version: ${{ matrix.python-version }}
+                cache: "pipenv"
+            - uses: tiagovrtr/actions-pipenv@42dd846ed39aab687919c45dd5e80e448f0da503
+              with:
+                pipenv-version: ${{ matrix.pipenv-version }}
+            - name: "run tests"
+              run: ./build.sh
