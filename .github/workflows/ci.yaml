@@ -17,6 +17,7 @@ jobs:
             - uses: actions/checkout@v4.1.7
               with:
                 submodules: true
+            - run: apt show openscad
             - uses: ConorMacBride/install-package@3e7ad059e07782ee54fa35f827df52aae0626f30
               with:
                 apt: openscad=${{ matrix.openscad-version }}
