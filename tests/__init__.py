@@ -32,3 +32,16 @@ def vector_runner(name: str, parameters: dict[str, str]) -> OpenScadRunner:
         verbose=True,
         set_vars=parameters,
     )
+
+
+def report_and_assert(runner: OpenScadRunner, should_succeed: bool):
+    print(f"Command:\n{runner.cmdline}")
+    print("------------------------------------------------------------------------")
+    print(f"Return code:\n{runner.return_code}")
+    print("------------------------------------------------------------------------")
+    print(f"Warnings:\n{"\n".join(runner.warnings)}")
+    print("------------------------------------------------------------------------")
+    print(f"Errors:\n{"\n".join(runner.errors)}")
+    print("------------------------------------------------------------------------")
+    print(f"Echos:\n{"\n".join(runner.echos)}")
+    assert(runner.good() is should_succeed)

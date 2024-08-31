@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Iterable
 from openscad_runner import OpenScadRunner
 import pytest
-from . import vector_file, output_file, vector_runner, DrawerFill
+from . import report_and_assert, vector_runner, DrawerFill
 
 
 @pytest.mark.parametrize(
@@ -27,7 +27,7 @@ def test_drawer_invalid_dimensions(width, depth, height):
         },
     )
     runner.run()
-    assert(not runner.good())
+    report_and_assert(runner, False)
 
 
 def test_drawer_invalid_fill_type():
@@ -38,7 +38,7 @@ def test_drawer_invalid_fill_type():
         },
     )
     runner.run()
-    assert(not runner.good())
+    report_and_assert(runner, False)
 
 
 @pytest.mark.parametrize("fill_type", [pytest.param(i, id=f"fill_type={i}") for i in DrawerFill])
@@ -58,7 +58,7 @@ def test_drawer(fill_type, width, depth, height, wall):
         },
     )
     runner.run()
-    assert(runner.good())
+    report_and_assert(runner, True)
 
 # execute all the examples
 
