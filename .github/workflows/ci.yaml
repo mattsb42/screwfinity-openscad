@@ -14,14 +14,14 @@ jobs:
                 os: ["ubuntu-latest"]
         runs-on: ${{ matrix.os }}
         steps:
-            - uses: actions/checkout@4.1.7
+            - uses: actions/checkout@v4.1.7
               with:
                 submodules: true
             - uses: ConorMacBride/install-package@3e7ad059e07782ee54fa35f827df52aae0626f30
               with:
                 apt: openscad=${{ matrix.openscad-version }}
                 brew: openscad=${{ matrix.openscad-version }}
-            - uses: actions/setup-python@5.2.0
+            - uses: actions/setup-python@v5.2.0
               with:
                 python-version: ${{ matrix.python-version }}
                 cache: "pipenv"
