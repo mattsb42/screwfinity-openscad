@@ -1,3 +1,3 @@
 #!/bin/bash
 rm -f build/vectors/*
-pytest -v $@
+pipenv run pytest -v $@
