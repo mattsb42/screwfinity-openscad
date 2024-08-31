@@ -1,0 +1,11 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+exclude = [
+    "gridfinity-rebuilt-openscad/",
+    "MCAD/",
+]
+
+[tool.ruff.lint]
+select = ["ALL"]
