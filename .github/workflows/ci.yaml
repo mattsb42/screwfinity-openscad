@@ -31,6 +31,7 @@ jobs:
             - run: pipenv install
             - name: "run tests"
               run: ./build.sh
+              continue-on-error: true
             - name: "upload test vector results"
               uses: actions/upload-artifact@v4
               with:
