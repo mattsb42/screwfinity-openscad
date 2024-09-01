@@ -1,21 +1,24 @@
 name: "release artifacts"
 on:
     push:
-        branches:
-            - 'main'
+        branches: ["main"]
+        # tags:
+        #     - "v[0-9]+.[0-9]+.[0-9]+"
+
 env:
     USE_PYTHON_VERSION: "3.12.5"
-            
+
 jobs:
-    artifacts:
+    build-artifacts:
         strategy:
             fail-fast: true
             matrix:
                 target:
-                    - "screwfinity_large"
-                    - "screwfinity_medium"
-                    - "screwfinity_medium_wide"
-                    - "screwfinity_small"
+                    # temporarily disable long-running jobs to test
+                    # - "screwfinity_large"
+                    # - "screwfinity_medium"
+                    # - "screwfinity_medium_wide"
+                    # - "screwfinity_small"
                     - "screwfinity_medium_wide_4u"
         runs-on: "ubuntu-latest"
         steps:
@@ -41,3 +44,15 @@ jobs:
                   name: ${{ matrix.target }}
                   path: "build/vectors/"
                   if-no-files-found: "error"
+
+    create-release:
+        runs-on: "ubuntu-latest"
+        steps:
+            - name: "download all artifacts"
+              uses: actions/download-artifact@v4.1.8
+              with:
+                path: artifacts/
+                merge-multiple: true
+            - run: "find artifacts/"
+            # - name: "create release from tag"
+            #   uses: softprops/action-gh-release@v2.0.8
