@@ -39,3 +39,17 @@ def compatibility(session):
     setup_environment(session)
     clean_build("screwfinity")
     session.run("pytest", "-k", "compatibility", "-v", env=ENV)
+
+
+@nox.session
+@nox.parametrize("marker", [
+    "screwfinity-small",
+    "screwfinity-medium",
+    "screwfinity-large",
+    "screwfinity-medium-wide",
+    "screwfinity-medium-wide-4u",
+])
+def artifacts(session, marker):
+    setup_environment(session)
+    clean_build("screwfinity")
+    session.run("pytest", "-k", marker, "-v", env=ENV)

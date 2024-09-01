@@ -15,6 +15,7 @@ def small_cabinets():
                 ScrewfinityStandardDrawerHeights.SMALL,
                 rows,
                 id=f"Screwfinity SMALL 2U {rows}x{width}",
+                marks=["screwfinity-small"],
             )
 
 
@@ -30,6 +31,7 @@ def medium_cabinets():
             ScrewfinityStandardDrawerHeights.MEDIUM,
             rows,
             id=f"Screwfinity MEDIUM 2U {rows}x{width}",
+            marks=["screwfinity-medium"],
         )
 
     for width in [2, 3, 4, 5, 6]:
@@ -55,6 +57,7 @@ def medium_wide_cabinets():
                 ScrewfinityStandardDrawerHeights.MEDIUM,
                 rows,
                 id=f"Screwfinity MEDIUM WIDE 2U {rows}x{width}",
+                marks=["screwfinity-medium-wide"],
             )
 
 
@@ -71,6 +74,7 @@ def large_cabinets():
                 ScrewfinityStandardDrawerHeights.LARGE,
                 rows,
                 id=f"Screwfinity LARGE 2U {rows}x{width}",
+                marks=["screwfinity-large"],
             )
 
 
@@ -87,6 +91,7 @@ def medium_wide_4u_cabinets():
                 ScrewfinityStandardDrawerHeights.MEDIUM,
                 rows,
                 id=f"Screwfinity MEDIUM WIDE 4U {rows}x{width}",
+                marks=["screwfinity-medium-wide-4u"],
             )
 
 
