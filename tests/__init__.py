@@ -24,6 +24,7 @@ def output_file(name: str) -> Path:
 
 
 def vector_runner(name: str, parameters: dict[str, str]) -> OpenScadRunner:
+    OUTPUT_VECTORS.mkdir(parents=True, exist_ok=True)
     output_suffix = ",".join([f"{key}={value}" for key, value in sorted(parameters.items())])
     return OpenScadRunner(
         scriptfile=str(vector_file(name)),
