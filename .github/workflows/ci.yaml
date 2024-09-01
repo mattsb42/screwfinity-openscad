@@ -3,14 +3,16 @@ on:
     - pull_request
     - push
 
+env:
+    USE_PYTHON_VERSION: "3.12.5"
+    USE_PIPENV_VERSION: "2024.0.1"
+
 jobs:
     ci:
         strategy:
             fail-fast: true
             matrix:
                 openscad-version: ["2021.01"]
-                python-version: ["3.12.5"]
-                pipenv-version: ["2024.0.1"]
                 os: ["ubuntu-latest"]
         runs-on: ${{ matrix.os }}
         steps:
@@ -23,11 +25,11 @@ jobs:
                 brew: openscad
             - uses: actions/setup-python@v5.2.0
               with:
-                python-version: ${{ matrix.python-version }}
+                python-version: ${{ env.USE_PYTHON_VERSION }}
                 cache: "pipenv"
             - uses: tiagovrtr/actions-pipenv@42dd846ed39aab687919c45dd5e80e448f0da503
               with:
-                pipenv-version: ${{ matrix.pipenv-version }}
+                pipenv-version: ${{ env.USE_PIPENV_VERSION }}
             - run: pipenv install
             - name: "run tests"
               run: ./build.sh
@@ -35,6 +37,6 @@ jobs:
               if: ${{ always() }}
               uses: actions/upload-artifact@v4.4.0
               with:
-                name: "vector-results"
+                name: "vector-results_${{ matrix.os }}_${{ matrix.openscad-version }}"
                 path: "build/vectors/"
                 if-no-files-found: "error"
