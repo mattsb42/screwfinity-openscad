@@ -29,8 +29,6 @@ jobs:
               with:
                 pipenv-version: ${{ matrix.pipenv-version }}
             - run: pipenv install
-            - name: "start headless xServer"
-              run: Xvfb & export DISPLAY=:99
             - name: "run tests"
               run: ./build.sh
               continue-on-error: true
