@@ -15,6 +15,18 @@ class DrawerFill(IntEnum):
     SQUARE_CUT = 2
 
 
+class CabinetBases(IntEnum):
+    NO_BASE = 0
+    GRIDFINITY_BASE = 1
+
+
+class CabinetTops(IntEnum):
+    NO_TOP = 0
+    LIP_TOP = 1
+    GRIDFINITY_STACKING_TOP = 2
+    GRIDFINITY_BASEPLATE_MAGNET_TOP = 3
+
+
 def vector_file(name: str) -> Path:
     return VECTORS / f"{name}.scad"
 

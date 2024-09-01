@@ -69,11 +69,3 @@ def test_drawer(fill_type, width, depth, height, wall):
     runner.run()
     report(runner)
     assert(runner.good())
-
-# execute all the examples
-
-# cabinet width
-# cabinet depth
-# cabinet row combinations
-# cabinet top
-# cabinet base
