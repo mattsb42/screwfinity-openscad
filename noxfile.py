@@ -19,12 +19,11 @@ def setup_environment(session):
         ENV["DISPLAY"] = ":99"
 
 
-def clean_build(prefix: str=""):
+def clean_build():
     if not BUILD_VECTORS.exists():
         return
     for child in BUILD_VECTORS.iterdir():
-        if child.name.startswith(prefix):
-            child.unlink()
+        child.unlink()
 
 
 @nox.session
@@ -37,7 +36,7 @@ def test(session):
 @nox.session
 def compatibility(session):
     setup_environment(session)
-    clean_build("screwfinity")
+    clean_build()
     session.run("pytest", "-k", "compatibility", "-v", env=ENV)
 
 
