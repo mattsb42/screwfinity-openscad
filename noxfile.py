@@ -50,5 +50,5 @@ def compatibility(session):
 ])
 def artifacts(session, marker):
     setup_environment(session)
-    clean_build("screwfinity")
+    clean_build()
     session.run("pytest", "-k", marker, "-v", env=ENV)
