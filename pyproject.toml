@@ -2,11 +2,11 @@
 testpaths = ["tests"]
 markers = [
     "compatibility: upstream screwfinity compatibility artifacts",
-    "screwfinity-large",
-    "screwfinity-medium",
-    "screwfinity-small",
-    "screwfinity-medium-wide",
-    "screwfinity-medium-wide-4u",
+    "screwfinity_large",
+    "screwfinity_medium",
+    "screwfinity_small",
+    "screwfinity_medium_wide",
+    "screwfinity_medium_wide_4u",
 ]
 
 [tool.ruff]

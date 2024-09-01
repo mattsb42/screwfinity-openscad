@@ -43,11 +43,11 @@ def compatibility(session):
 
 @nox.session
 @nox.parametrize("marker", [
-    "screwfinity-small",
-    "screwfinity-medium",
-    "screwfinity-large",
-    "screwfinity-medium-wide",
-    "screwfinity-medium-wide-4u",
+    "screwfinity_small",
+    "screwfinity_medium",
+    "screwfinity_large",
+    "screwfinity_medium_wide",
+    "screwfinity_medium_wide_4u",
 ])
 def artifacts(session, marker):
     setup_environment(session)

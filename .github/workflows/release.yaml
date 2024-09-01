@@ -12,11 +12,11 @@ jobs:
             fail-fast: true
             matrix:
                 target:
-                    - "screwfinity-large"
-                    - "screwfinity-medium"
-                    - "screwfinity-medium-wide"
-                    - "screwfinity-small"
-                    - "screwfinity-medium-wide-4u"
+                    - "screwfinity_large"
+                    - "screwfinity_medium"
+                    - "screwfinity_medium_wide"
+                    - "screwfinity_small"
+                    - "screwfinity_medium_wide_4u"
         runs-on: "ubuntu-latest"
         steps:
             - uses: actions/checkout@v4.1.7
