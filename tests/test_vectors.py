@@ -2,21 +2,21 @@ from pathlib import Path
 from typing import Iterable
 from openscad_runner import OpenScadRunner
 import pytest
-from . import report_and_assert, vector_runner, DrawerFill
+from . import assert_error_present, report, vector_runner, DrawerFill
 
 
 @pytest.mark.parametrize(
-        "width, depth, height",
+        "width, depth, height, error_message",
         [
-            pytest.param(-1, 1, 10, id="negative width"),
-            pytest.param(1, -1, 10, id="negative depth"),
-            pytest.param(1, 1, -10, id="negative height"),
-            pytest.param(1, 1.5, 10, id="non-integer depth"),
+            pytest.param(-1, 1, 10, "All dimensions MUST be positive", id="negative width"),
+            pytest.param(1, -1, 10, "All dimensions MUST be positive", id="negative depth"),
+            pytest.param(1, 1, -10, "All dimensions MUST be positive", id="negative height"),
+            pytest.param(1, 1.5, 10, "Invalid unit_depth value", id="non-integer depth"),
             # maybe break out too-narrow drawers into their own broader test case later
-            pytest.param(0.1, 1, 10, id="width too narrow"),
+            pytest.param(0.1, 1, 10, "Drawer width is too narrow", id="width too narrow"),
         ],
 )
-def test_drawer_invalid_dimensions(width, depth, height):
+def test_drawer_invalid_dimensions(width, depth, height, error_message):
     runner = vector_runner(
         name="drawer",
         parameters={
@@ -27,7 +27,9 @@ def test_drawer_invalid_dimensions(width, depth, height):
         },
     )
     runner.run()
-    report_and_assert(runner, False)
+    report(runner)
+    assert(not runner.good())
+    assert_error_present(runner, error_message)
 
 
 def test_drawer_invalid_fill_type():
@@ -38,7 +40,9 @@ def test_drawer_invalid_fill_type():
         },
     )
     runner.run()
-    report_and_assert(runner, False)
+    report(runner)
+    assert(not runner.good())
+    assert_error_present(runner, "Invalid fill type")
 
 
 @pytest.mark.parametrize("fill_type", [pytest.param(i, id=f"fill_type={i}") for i in DrawerFill])
@@ -58,7 +62,8 @@ def test_drawer(fill_type, width, depth, height, wall):
         },
     )
     runner.run()
-    report_and_assert(runner, True)
+    report(runner)
+    assert(runner.good())
 
 # execute all the examples
 

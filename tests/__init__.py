@@ -35,7 +35,7 @@ def vector_runner(name: str, parameters: dict[str, str]) -> OpenScadRunner:
     )
 
 
-def report_and_assert(runner: OpenScadRunner, should_succeed: bool):
+def report(runner: OpenScadRunner):
     print(f"Command:\n{runner.cmdline}")
     print("------------------------------------------------------------------------")
     print(f"Return code:\n{runner.return_code}")
@@ -49,4 +49,7 @@ def report_and_assert(runner: OpenScadRunner, should_succeed: bool):
     print(f"stdout:\n{"\n".join(runner.stdout)}")
     print("------------------------------------------------------------------------")
     print(f"stderr:\n{"\n".join(runner.stderr)}")
-    assert(runner.good() is should_succeed)
+
+
+def assert_error_present(runner: OpenScadRunner, error_message: str):
+    assert(any([f"ERROR: {error_message}" in line for line in runner.errors]))
