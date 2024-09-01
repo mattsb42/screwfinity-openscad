@@ -4,6 +4,11 @@ from openscad_runner import OpenScadRunner
 import pytest
 from . import assert_error_present, report, vector_runner, DrawerFill
 
+GOOD_WIDTHS = [0.5, 1, 2, 3]
+GOOD_DEPTHS = [1, 2, 3]
+GOOD_HEIGHTS = [10, 20, 30]
+GOOD_WALLS = [0.5, 1, 2]
+
 
 @pytest.mark.parametrize(
         "width, depth, height, error_message",
@@ -46,10 +51,10 @@ def test_drawer_invalid_fill_type():
 
 
 @pytest.mark.parametrize("fill_type", [pytest.param(i, id=f"fill_type={i}") for i in DrawerFill])
-@pytest.mark.parametrize("width", [pytest.param(i, id=f"width={i}") for i in [0.5, 1, 2, 3]])
-@pytest.mark.parametrize("depth", [pytest.param(i, id=f"depth={i}") for i in [1, 2, 3]])
-@pytest.mark.parametrize("height", [pytest.param(i, id=f"height={i}") for i in [10, 20, 30]])
-@pytest.mark.parametrize("wall", [pytest.param(i, id=f"wall={i}") for i in [0.5, 1, 2]])
+@pytest.mark.parametrize("width", [pytest.param(i, id=f"width={i}") for i in GOOD_WIDTHS])
+@pytest.mark.parametrize("depth", [pytest.param(i, id=f"depth={i}") for i in GOOD_DEPTHS])
+@pytest.mark.parametrize("height", [pytest.param(i, id=f"height={i}") for i in GOOD_HEIGHTS])
+@pytest.mark.parametrize("wall", [pytest.param(i, id=f"wall={i}") for i in GOOD_WALLS])
 def test_drawer(fill_type, width, depth, height, wall):
     runner = vector_runner(
         name="drawer",
