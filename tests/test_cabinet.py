@@ -62,6 +62,16 @@ def test_base_styles(base):
     assert(runner.good())
 
 
+def test_complex_row_combinations():
+    runner = vector_runner(
+        name="cabinet-complex",
+        parameters={},
+    )
+    runner.run()
+    report(runner)
+    assert(runner.good())
+
+
 @pytest.mark.parametrize("width", [pytest.param(i, id=f"width={i}") for i in [0.1, 1.5]])
 @pytest.mark.parametrize("depth", [pytest.param(i, id=f"depth={i}") for i in [0.1, 1.5]])
 def test_invalid_footprint(width, depth):
