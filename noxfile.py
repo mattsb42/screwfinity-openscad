@@ -20,6 +20,8 @@ def setup_environment(session):
 
 
 def clean_build(prefix: str=""):
+    if not BUILD_VECTORS.exists():
+        return
     for child in BUILD_VECTORS.iterdir():
         if child.name.startswith(prefix):
             child.unlink()
