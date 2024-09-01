@@ -53,7 +53,6 @@ jobs:
               uses: actions/download-artifact@v4.1.8
               with:
                 path: artifacts/
-                merge-multiple: true
             - run: "find ./"
             # - name: "create release from tag"
             #   uses: softprops/action-gh-release@v2.0.8
