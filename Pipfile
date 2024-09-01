@@ -8,6 +8,7 @@ pytest = "*"
 openscad-runner = "*"
 ruff = "*"
 setuptools = "*"
+nox = "*"
 
 [dev-packages]
 
