@@ -46,6 +46,7 @@ jobs:
                   if-no-files-found: "error"
 
     create-release:
+        needs: build-artifacts
         runs-on: "ubuntu-latest"
         steps:
             - name: "download all artifacts"
@@ -53,6 +54,6 @@ jobs:
               with:
                 path: artifacts/
                 merge-multiple: true
-            - run: "find artifacts/"
+            - run: "find ./"
             # - name: "create release from tag"
             #   uses: softprops/action-gh-release@v2.0.8
