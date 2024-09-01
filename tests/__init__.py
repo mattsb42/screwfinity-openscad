@@ -44,4 +44,8 @@ def report_and_assert(runner: OpenScadRunner, should_succeed: bool):
     print(f"Errors:\n{"\n".join(runner.errors)}")
     print("------------------------------------------------------------------------")
     print(f"Echos:\n{"\n".join(runner.echos)}")
+    print("------------------------------------------------------------------------")
+    print(f"stdout:\n{"\n".join(runner.stdout)}")
+    print("------------------------------------------------------------------------")
+    print(f"stderr:\n{"\n".join(runner.stderr)}")
     assert(runner.good() is should_succeed)
