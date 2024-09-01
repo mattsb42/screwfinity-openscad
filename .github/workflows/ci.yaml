@@ -37,4 +37,4 @@ jobs:
               with:
                 name: "vector-results"
                 path: "build/vectors/"
-                if-no-files-found: "fail"
+                if-no-files-found: "error"
