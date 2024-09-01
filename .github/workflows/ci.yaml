@@ -14,14 +14,14 @@ jobs:
                 os: ["ubuntu-latest"]
         runs-on: ${{ matrix.os }}
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v4.1.7
               with:
                 submodules: true
             - uses: ConorMacBride/install-package@3e7ad059e07782ee54fa35f827df52aae0626f30
               with:
                 apt: openscad
                 brew: openscad
-            - uses: actions/setup-python@v5
+            - uses: actions/setup-python@v5.2.0
               with:
                 python-version: ${{ matrix.python-version }}
                 cache: "pipenv"
@@ -33,7 +33,7 @@ jobs:
               run: ./build.sh
               continue-on-error: true
             - name: "upload test vector results"
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v4.4.0
               with:
                 name: "vector-results"
                 path: "build/vectors/"
