@@ -15,7 +15,7 @@ BUILD_VECTORS = HERE / "build" / "vectors"
 def setup_environment(session):
     session.install(*TEST_DEPENDENCIES)
     if "GITHUB_ACTIONS" in os.environ:
-        session.run("Xvfb", ":99", "&", external=True)
+        session.run("./start-xvfb.sh", external=True)
         ENV["DISPLAY"] = ":99"
 
 
