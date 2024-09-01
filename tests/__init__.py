@@ -35,7 +35,7 @@ def output_file(name: str) -> Path:
     return OUTPUT_VECTORS / f"{name}.png"
 
 
-def vector_runner(name: str, parameters: dict[str, str]) -> OpenScadRunner:
+def vector_runner(name: str, parameters: dict[str, str], camera: list[int]=None) -> OpenScadRunner:
     OUTPUT_VECTORS.mkdir(parents=True, exist_ok=True)
     output_suffix = ",".join([f"{key}={value}" for key, value in sorted(parameters.items())])
     return OpenScadRunner(
@@ -44,6 +44,8 @@ def vector_runner(name: str, parameters: dict[str, str]) -> OpenScadRunner:
         hard_warnings=True,
         verbose=True,
         set_vars=parameters,
+        camera=camera,
+        auto_center=True,
     )
 
 

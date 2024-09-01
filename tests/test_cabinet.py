@@ -7,6 +7,8 @@ GOOD_DRAWER_WIDTHS = [0.5, 1, 2, 3]
 GOOD_DRAWER_HEIGHTS = [10, 20, 30]
 GOOD_ROWS = [1, 2, 3]
 
+CABINET_CAMERA = [500, 500, 100]
+
 
 def good_cabinet_and_drawer_widths():
     for width in GOOD_WIDTHS:
@@ -30,6 +32,7 @@ def test_grid_expand(width, depth, drawer_width, drawer_height, rows):
             "drawer_height": drawer_height,
             "rows": rows,
         },
+        camera=CABINET_CAMERA,
     )
     runner.run()
     report(runner)
@@ -43,6 +46,7 @@ def test_top_styles(top):
         parameters={
             "top_style": top,
         },
+        camera=CABINET_CAMERA,
     )
     runner.run()
     report(runner)
@@ -56,6 +60,7 @@ def test_base_styles(base):
         parameters={
             "base_style": base,
         },
+        camera=CABINET_CAMERA,
     )
     runner.run()
     report(runner)
@@ -66,6 +71,7 @@ def test_complex_row_combinations():
     runner = vector_runner(
         name="cabinet-complex",
         parameters={},
+        camera=CABINET_CAMERA,
     )
     runner.run()
     report(runner)
@@ -81,6 +87,7 @@ def test_invalid_footprint(width, depth):
             "unit_width": width,
             "unit_depth": depth,
         },
+        camera=CABINET_CAMERA,
     )
     runner.run()
     report(runner)
@@ -102,6 +109,7 @@ def test_invalid_width_combinations(width, drawer_width):
             "unit_width": width,
             "drawer_unit_width": drawer_width,
         },
+        camera=CABINET_CAMERA,
     )
     runner.run()
     report(runner)
@@ -116,6 +124,7 @@ def test_invalid_base_style(base):
         parameters={
             "base_style": base,
         },
+        camera=CABINET_CAMERA,
     )
     runner.run()
     report(runner)
@@ -130,6 +139,7 @@ def test_invalid_top_style(top):
         parameters={
             "top_style": top,
         },
+        camera=CABINET_CAMERA,
     )
     runner.run()
     report(runner)
