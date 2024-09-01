@@ -7,4 +7,4 @@ if [[ $GITHUB_ACTIONS ]];then
     Xvfb :99 & export DISPLAY=:99
 fi
 
-pipenv run pytest -v $@
+pipenv run pytest -k "not compatibility" -v $@

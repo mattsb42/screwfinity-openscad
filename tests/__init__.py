@@ -1,5 +1,6 @@
 from enum import IntEnum
 from pathlib import Path
+from typing import Optional
 from openscad_runner import OpenScadRunner
 import json
 import pytest
@@ -27,20 +28,27 @@ class CabinetTops(IntEnum):
     GRIDFINITY_BASEPLATE_MAGNET_TOP = 3
 
 
+class ScrewfinityStandardDrawerHeights(IntEnum):
+    SMALL = 20
+    MEDIUM = 30
+    LARGE = 40
+
+
 def vector_file(name: str) -> Path:
     return VECTORS / f"{name}.scad"
 
 
-def output_file(name: str) -> Path:
-    return OUTPUT_VECTORS / f"{name}.png"
+def output_file(name: str, extension: str) -> Path:
+    return OUTPUT_VECTORS / f"{name}.{extension}"
 
 
-def vector_runner(name: str, parameters: dict[str, str], camera: list[int]=None) -> OpenScadRunner:
+def vector_runner(name: str, parameters: dict[str, str], output_suffix: Optional[str]=None, extension: str="png", camera: Optional[list[int]]=None) -> OpenScadRunner:
     OUTPUT_VECTORS.mkdir(parents=True, exist_ok=True)
-    output_suffix = ",".join([f"{key}={value}" for key, value in sorted(parameters.items())])
+    if output_suffix is None:
+        output_suffix = ",".join([f"{key}={value}" for key, value in sorted(parameters.items())])
     return OpenScadRunner(
         scriptfile=str(vector_file(name)),
-        outfile=str(output_file(f"{name}-{output_suffix}")),
+        outfile=str(output_file(f"{name}-{output_suffix}", extension)),
         hard_warnings=True,
         verbose=True,
         set_vars=parameters,

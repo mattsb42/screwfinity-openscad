@@ -14,6 +14,7 @@ jobs:
             matrix:
                 openscad-version: ["2021.01"]
                 os: ["ubuntu-latest"]
+                script: ["./build.sh", "./compat.sh"]
         runs-on: ${{ matrix.os }}
         steps:
             - uses: actions/checkout@v4.1.7
@@ -32,7 +33,7 @@ jobs:
                 pipenv-version: ${{ env.USE_PIPENV_VERSION }}
             - run: pipenv install
             - name: "run tests"
-              run: ./build.sh
+              run: ${{ matrix.script }}
             - name: "upload test vector results"
               if: ${{ always() }}
               uses: actions/upload-artifact@v4.4.0

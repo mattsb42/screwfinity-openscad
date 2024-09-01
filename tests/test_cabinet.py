@@ -39,7 +39,7 @@ def test_grid_expand(width, depth, drawer_width, drawer_height, rows):
     assert(runner.good())
 
 
-@pytest.mark.parametrize("top", [pytest.param(i, id=f"top={i}") for i in CabinetTops])
+@pytest.mark.parametrize("top", [pytest.param(i, id=f"top={i.name}") for i in CabinetTops])
 def test_top_styles(top):
     runner = vector_runner(
         name="cabinet-grid-expand",
@@ -53,7 +53,7 @@ def test_top_styles(top):
     assert(runner.good())
 
 
-@pytest.mark.parametrize("base", [pytest.param(i, id=f"base={i}") for i in CabinetBases])
+@pytest.mark.parametrize("base", [pytest.param(i, id=f"base={i.name}") for i in CabinetBases])
 def test_base_styles(base):
     runner = vector_runner(
         name="cabinet-grid-expand",

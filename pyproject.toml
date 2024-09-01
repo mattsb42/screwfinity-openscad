@@ -1,5 +1,8 @@
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "compatibility: upstream screwfinity compatibility artifacts",
+]
 
 [tool.ruff]
 exclude = [
