@@ -76,6 +76,10 @@ This leaves the drawer body as a solid.
 You can them import the model into your modeling software of choice
 and create your own cutouts as needed.
 
+## Label Slots
+
+The slot that a label slides into is 0.5mm thick.
+
 # Cabinets
 
 The width and depth of cabinets are defined by

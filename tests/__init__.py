@@ -16,6 +16,11 @@ class DrawerFill(IntEnum):
     SQUARE_CUT = 2
 
 
+class DrawerHandleLabelCut(IntEnum):
+    NO_LABEL_CUT = 0
+    LABEL_CUT = 1
+
+
 class CabinetBases(IntEnum):
     NO_BASE = 0
     GRIDFINITY_BASE = 1

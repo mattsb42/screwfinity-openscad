@@ -1,5 +1,5 @@
 import pytest
-from . import assert_error_present, report, vector_runner, DrawerFill
+from . import assert_error_present, report, vector_runner, DrawerFill, DrawerHandleLabelCut
 
 GOOD_WIDTHS = [0.5, 1, 2, 3]
 GOOD_DEPTHS = [1, 2, 3]
@@ -7,15 +7,17 @@ GOOD_HEIGHTS = [10, 20, 30]
 GOOD_WALLS = [0.5, 1, 2]
 
 
+@pytest.mark.parametrize("label_cut", [pytest.param(i, id=f"fill_type={i.name}") for i in DrawerHandleLabelCut])
 @pytest.mark.parametrize("fill_type", [pytest.param(i, id=f"fill_type={i.name}") for i in DrawerFill])
 @pytest.mark.parametrize("width", [pytest.param(i, id=f"width={i}") for i in GOOD_WIDTHS])
 @pytest.mark.parametrize("depth", [pytest.param(i, id=f"depth={i}") for i in GOOD_DEPTHS])
 @pytest.mark.parametrize("height", [pytest.param(i, id=f"height={i}") for i in GOOD_HEIGHTS])
 @pytest.mark.parametrize("wall", [pytest.param(i, id=f"wall={i}") for i in GOOD_WALLS])
-def test_drawer(fill_type, width, depth, height, wall):
+def test_drawer(label_cut, fill_type, width, depth, height, wall):
     runner = vector_runner(
         name="drawer",
         parameters={
+            "label_cut": label_cut,
             "fill_type": fill_type,
             "unit_width": width,
             "unit_depth": depth,
@@ -66,3 +68,16 @@ def test_drawer_invalid_fill_type():
     report(runner)
     assert(not runner.good())
     assert_error_present(runner, "Invalid fill type")
+
+
+def test_invalid_label_cut():
+    runner = vector_runner(
+        name="drawer",
+        parameters={
+            "label_cut": -1,
+        },
+    )
+    runner.run()
+    report(runner)
+    assert(not runner.good())
+    assert_error_present(runner, "Invalid label cut type")
