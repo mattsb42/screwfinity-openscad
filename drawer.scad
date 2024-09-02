@@ -111,8 +111,12 @@ module Drawer(dimensions, drawer_wall=1, fill_type=SQUARE_CUT, label_cut=NO_LABE
     module Handle() {
         handle_lip = 8;
         handle_support_width = outside.x / 3;
+        // distance from outer edge of drawer to start of label slot
+        label_slot_offset = 2;
         label_slot_thickness = .5;
         label_cutout_thickness = handle_wall - label_slot_thickness;
+        // overhang that holds the label in place
+        label_cutout_overhang = 2;
         edge = [outside.x / 2 - handle_wall, handle_wall * 2, outside.z / 2];
 
         // start at the top front edge of the drawer
@@ -158,23 +162,28 @@ module Drawer(dimensions, drawer_wall=1, fill_type=SQUARE_CUT, label_cut=NO_LABE
         // pull in to get the right thickness
         // and translate up to match the lip angle
         lip_translate = [0, (handle_lip * 2) - label_cutout_thickness, edge.z * 4];
-        label_slot_offset = yz_offset(1);
-        echo(str("OFFSET: ", label_slot_offset));
-        // label_slot_upper = [edge.x - 1, edge.y - label_slot_offset.y, edge.z + label_slot_offset.z];
-        label_slot_upper = [edge.x - 1, -1 * lip_translate.y, lip_translate.z];
+        label_slot_upper = [edge.x - label_slot_offset, -1 * lip_translate.y, lip_translate.z];
         module LabelSlotUpperLeft() translate([label_slot_upper.x, label_slot_upper.y, label_slot_upper.z]) sphere(r=label_slot_thickness);
         module LabelSlotUpperRight() translate([-1 * label_slot_upper.x, label_slot_upper.y, label_slot_upper.z]) sphere(r=label_slot_thickness);
-        
+
         label_slot_lower = [edge.x - 1, handle_lip - label_cutout_thickness, 0];
         module LabelSlotLowerLeft() translate([label_slot_lower.x, label_slot_lower.y, label_slot_lower.z]) sphere(r=label_slot_thickness);
         module LabelSlotLowerRight() translate([-1 * label_slot_lower.x, label_slot_lower.y, label_slot_lower.z]) sphere(r=label_slot_thickness);
 
-        label_cutout_inner_upper = [label_slot_upper.x - 1, label_slot_upper.y, label_slot_upper.z];
-        label_cutout_outer_upper = [label_cutout_inner_upper.x, label_cutout_inner_upper.y, label_cutout_inner_upper.z + 10];
-        // TODO: need a calculator for the rise/run at the correct ratio; outer is just the opposite if inner
-        label_cutout_inner_offset = yz_offset(1);
-        label_cutout_inner_lower = [label_slot_lower.x - 1, label_slot_lower.y - label_cutout_inner_offset.y, label_slot_lower.z + label_cutout_inner_offset.z];
+        label_cutout_inner_upper = [label_slot_upper.x - label_cutout_overhang, label_slot_upper.y, label_slot_upper.z];
+        // no fancy math needed for this offset
+        // we're already above the cutoff plane
+        label_cutout_outer_upper = [label_cutout_inner_upper.x, label_cutout_inner_upper.y, label_cutout_inner_upper.z];
 
+        // walk up the slope of the handle plane
+        label_cutout_inner_offset = yz_offset(1);
+        label_cutout_inner_lower = [
+            label_slot_lower.x - label_cutout_overhang,
+            label_slot_lower.y - label_cutout_inner_offset.y,
+            label_slot_lower.z + label_cutout_inner_offset.z
+        ];
+
+        // walk out perpendicular to the handle plane
         label_cutout_outer_offset = yz_offset(10);
         label_cutout_outer_lower = [label_cutout_inner_lower.x, label_cutout_inner_lower.y + label_cutout_outer_offset.y, label_cutout_inner_lower.z + label_cutout_outer_offset.z];
         module LabelCutoutInnerUpperLeft() translate([label_cutout_inner_upper.x, label_cutout_inner_upper.y, label_cutout_inner_upper.z]) sphere(r=label_slot_thickness);
