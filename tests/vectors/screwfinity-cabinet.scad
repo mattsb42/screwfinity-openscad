@@ -13,6 +13,7 @@ drawer_height = SMALL;
 rows = 2;
 top_style = NO_TOP;
 base_style = NO_BASE;
+label_cut = LABEL_CUT;
 
 Cabinet(
     gridfinity_footprint=[unit_width, unit_depth],
@@ -24,5 +25,6 @@ Cabinet(
         rows=rows
     ),
     top=surface_options(style=top_style),
-    base=surface_options(style=base_style)
+    base=surface_options(style=base_style),
+    label_cut=label_cut
 );
