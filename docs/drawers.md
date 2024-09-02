@@ -15,7 +15,8 @@ Drawer(
         height=40
     ),
     drawer_wall=1, // default
-    fill_type=SQUARE_CUT // default
+    fill_type=SQUARE_CUT, // default
+    label_cut=NO_LABEL_CUT // default
 );
 
 ```
@@ -73,3 +74,14 @@ You can find these values in `options.scad`.
   Leaves the drawer body solid,
   with no cutout.
   Use this if you want to make your own custom drawers.
+
+## label_cut
+
+Do you want to have a window and slot for a label?
+You can find these values in `options.scad`.
+
+- `NO_LABEL_CUT` :
+  Leave the handle solid.
+- `LABEL_CUT` :
+  Cut a slot to fit a label,
+  along with a window to view the label.
