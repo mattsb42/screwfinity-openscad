@@ -112,8 +112,10 @@ module Drawer(dimensions, drawer_wall=1, fill_type=SQUARE_CUT, label_cut=NO_LABE
         handle_lip = 8;
         handle_support_width = outside.x / 3;
         // distance from outer edge of drawer to start of label slot
-        label_slot_offset = 2;
+        label_slot_offset = 1.5;
         label_slot_thickness = .5;
+        // distance from face to label slot
+        label_slot_face_offset = .5;
         label_cutout_thickness = handle_wall - label_slot_thickness;
         // overhang that holds the label in place
         label_cutout_overhang = 2;
@@ -145,15 +147,27 @@ module Drawer(dimensions, drawer_wall=1, fill_type=SQUARE_CUT, label_cut=NO_LABE
         module BaseInnerLeft() translate([edge.x - handle_support_width, 0, edge.z]) sphere(r=handle_wall);
         module BaseInnerRight() translate([-1  * (edge.x - handle_support_width), 0, edge.z]) sphere(r=handle_wall);
 
-        function yz_offset(hypotenuse) =
+        face_pane_angle = 
             let(
-                // outer plane outer surface top vs bottom
-                // this gives us the ratio
+                // run from outer surface bottom to front of drawer body
                 baseline_run=abs(handle_lip - edge.y),
-                baseline_rise=edge.z - 0,
-                // angle in y-z plane of faceplate surface
-                angle=atan(baseline_run / baseline_rise),
+                // rise from outer surface bottom to top
+                baseline_rise=edge.z - 0
+            )
+            atan(baseline_rise / baseline_run);
+
+        function parallel_offset(hypotenuse) =
+            let(
+                angle=face_pane_angle,
                 // the y/z offsets we want to match the angle
+                run=cos(angle) * hypotenuse,
+                rise=sin(angle) * hypotenuse
+            )
+            [0, run, rise];
+
+        function perpendicular_offset(hypotenuse) =
+            let(
+                angle=90 - face_pane_angle,
                 run=cos(angle) * hypotenuse,
                 rise=sin(angle) * hypotenuse
             )
@@ -161,39 +175,81 @@ module Drawer(dimensions, drawer_wall=1, fill_type=SQUARE_CUT, label_cut=NO_LABE
 
         // pull in to get the right thickness
         // and translate up to match the lip angle
-        lip_translate = [0, (handle_lip * 2) - label_cutout_thickness, edge.z * 4];
-        label_slot_upper = [edge.x - label_slot_offset, -1 * lip_translate.y, lip_translate.z];
-        module LabelSlotUpperLeft() translate([label_slot_upper.x, label_slot_upper.y, label_slot_upper.z]) sphere(r=label_slot_thickness);
-        module LabelSlotUpperRight() translate([-1 * label_slot_upper.x, label_slot_upper.y, label_slot_upper.z]) sphere(r=label_slot_thickness);
-
-        label_slot_lower = [edge.x - 1, handle_lip - label_cutout_thickness, 0];
-        module LabelSlotLowerLeft() translate([label_slot_lower.x, label_slot_lower.y, label_slot_lower.z]) sphere(r=label_slot_thickness);
-        module LabelSlotLowerRight() translate([-1 * label_slot_lower.x, label_slot_lower.y, label_slot_lower.z]) sphere(r=label_slot_thickness);
-
-        label_cutout_inner_upper = [label_slot_upper.x - label_cutout_overhang, label_slot_upper.y, label_slot_upper.z];
-        // no fancy math needed for this offset
-        // we're already above the cutoff plane
-        label_cutout_outer_upper = [label_cutout_inner_upper.x, label_cutout_inner_upper.y, label_cutout_inner_upper.z];
-
-        // walk up the slope of the handle plane
-        label_cutout_inner_offset = yz_offset(1);
-        label_cutout_inner_lower = [
-            label_slot_lower.x - label_cutout_overhang,
-            label_slot_lower.y - label_cutout_inner_offset.y,
-            label_slot_lower.z + label_cutout_inner_offset.z
+        label_slot_lower = [
+            edge.x - label_slot_offset,
+            handle_lip - label_slot_face_offset,
+            0,
         ];
+        upper_offset = parallel_offset(dimensions.z);
+        label_slot_upper = [
+            label_slot_lower.x,
+            label_slot_lower.y - upper_offset.y,
+            label_slot_lower.z + upper_offset.z,
+        ];
+        
+        module LabelSlot() {
+            hull() {
+                // upper left
+                translate([label_slot_upper.x, label_slot_upper.y, label_slot_upper.z]) sphere(r=label_slot_thickness);
+                // upper right
+                translate([-1 * label_slot_upper.x, label_slot_upper.y, label_slot_upper.z]) sphere(r=label_slot_thickness);
+                // lower left
+                translate([label_slot_lower.x, label_slot_lower.y, label_slot_lower.z]) sphere(r=label_slot_thickness);
+                // lower right
+                translate([-1 * label_slot_lower.x, label_slot_lower.y, label_slot_lower.z]) sphere(r=label_slot_thickness);
+            }
+        }
 
-        // walk out perpendicular to the handle plane
-        label_cutout_outer_offset = yz_offset(10);
-        label_cutout_outer_lower = [label_cutout_inner_lower.x, label_cutout_inner_lower.y + label_cutout_outer_offset.y, label_cutout_inner_lower.z + label_cutout_outer_offset.z];
-        module LabelCutoutInnerUpperLeft() translate([label_cutout_inner_upper.x, label_cutout_inner_upper.y, label_cutout_inner_upper.z]) sphere(r=label_slot_thickness);
-        module LabelCutoutInnerUpperRight() translate([-1 * label_cutout_inner_upper.x, label_cutout_inner_upper.y, label_cutout_inner_upper.z]) sphere(r=label_slot_thickness);
-        module LabelCutoutOuterUpperLeft() translate([label_cutout_outer_upper.x, label_cutout_outer_upper.y, label_cutout_outer_upper.z]) sphere(r=label_slot_thickness);
-        module LabelCutoutOuterUpperRight() translate([-1 * label_cutout_outer_upper.x, label_cutout_outer_upper.y, label_cutout_outer_upper.z]) sphere(r=label_slot_thickness);
-        module LabelCutoutInnerLowerLeft() translate([label_cutout_inner_lower.x, label_cutout_inner_lower.y, label_cutout_inner_lower.z]) sphere(r=label_slot_thickness);
-        module LabelCutoutInnerLowerRight() translate([-1 * label_cutout_inner_lower.x, label_cutout_inner_lower.y, label_cutout_inner_lower.z]) sphere(r=label_slot_thickness);
-        module LabelCutoutOuterLowerLeft() translate([label_cutout_outer_lower.x, label_cutout_outer_lower.y, label_cutout_outer_lower.z]) sphere(r=label_slot_thickness);
-        module LabelCutoutOuterLowerRight() translate([-1 * label_cutout_outer_lower.x, label_cutout_outer_lower.y, label_cutout_outer_lower.z]) sphere(r=label_slot_thickness);
+        module LabelCutout() {
+            label_cutout_inner_upper = [
+                label_slot_upper.x - label_cutout_overhang,
+                label_slot_upper.y,
+                label_slot_upper.z
+            ];
+
+            // walk out perpendicular to the handle plane
+            label_cutout_outer_offset = perpendicular_offset(10);
+            
+            label_cutout_outer_upper = [
+                label_cutout_inner_upper.x,
+                label_cutout_inner_upper.y + label_cutout_outer_offset.y,
+                label_cutout_inner_upper.z + label_cutout_outer_offset.z
+            ];
+
+            // walk up the slope of the handle plane
+            label_cutout_inner_offset = parallel_offset(label_cutout_overhang);
+            label_cutout_inner_lower = [
+                label_slot_lower.x - label_cutout_overhang,
+                label_slot_lower.y - label_cutout_inner_offset.y,
+                label_slot_lower.z + label_cutout_inner_offset.z
+            ];
+
+            label_cutout_outer_lower = [
+                label_cutout_inner_lower.x,
+                label_cutout_inner_lower.y + label_cutout_outer_offset.y,
+                label_cutout_inner_lower.z + label_cutout_outer_offset.z
+            ];
+            hull() {
+                // inner upper left
+                translate([label_cutout_inner_upper.x, label_cutout_inner_upper.y, label_cutout_inner_upper.z]) sphere(r=label_slot_thickness);
+                // inner upper right
+                translate([-1 * label_cutout_inner_upper.x, label_cutout_inner_upper.y, label_cutout_inner_upper.z]) sphere(r=label_slot_thickness);
+                // inner lower left
+                translate([label_cutout_inner_lower.x, label_cutout_inner_lower.y, label_cutout_inner_lower.z]) sphere(r=label_slot_thickness);
+                // inner lower right
+                translate([-1 * label_cutout_inner_lower.x, label_cutout_inner_lower.y, label_cutout_inner_lower.z]) sphere(r=label_slot_thickness);
+
+                // outer upper left
+                translate([label_cutout_outer_upper.x, label_cutout_outer_upper.y, label_cutout_outer_upper.z]) sphere(r=label_slot_thickness);
+                // outer upper right
+                translate([-1 * label_cutout_outer_upper.x, label_cutout_outer_upper.y, label_cutout_outer_upper.z]) sphere(r=label_slot_thickness);
+                // outer lower left
+                translate([label_cutout_outer_lower.x, label_cutout_outer_lower.y, label_cutout_outer_lower.z]) sphere(r=label_slot_thickness);
+                // outer lower right
+                translate([-1 * label_cutout_outer_lower.x, label_cutout_outer_lower.y, label_cutout_outer_lower.z]) sphere(r=label_slot_thickness);
+            }
+        }
+
 
         /*
         Three structures form the handle,
@@ -225,23 +281,9 @@ module Drawer(dimensions, drawer_wall=1, fill_type=SQUARE_CUT, label_cut=NO_LABE
             }
         }
 
-        module LabelSlot() {
-            hull() {
-                LabelSlotUpperLeft();
-                LabelSlotUpperRight();
-                LabelSlotLowerLeft();
-                LabelSlotLowerRight();
-            }
-            hull() {
-                LabelCutoutInnerUpperLeft();
-                LabelCutoutInnerUpperRight();
-                LabelCutoutInnerLowerLeft();
-                LabelCutoutInnerLowerRight();
-                LabelCutoutOuterUpperLeft();
-                LabelCutoutOuterUpperRight();
-                LabelCutoutOuterLowerLeft();
-                LabelCutoutOuterLowerRight();
-            }
+        module LabelSlotWithWindow() {
+            LabelSlot();
+            LabelCutout();
         }
 
         module Face() {
@@ -265,7 +307,7 @@ module Drawer(dimensions, drawer_wall=1, fill_type=SQUARE_CUT, label_cut=NO_LABE
 
         difference() {
             SolidHandle();
-            if (label_cut == LABEL_CUT) LabelSlot();
+            if (label_cut == LABEL_CUT) LabelSlotWithWindow();
         }
     }
 
