@@ -7,7 +7,7 @@ GOOD_HEIGHTS = [10, 20, 30]
 GOOD_WALLS = [0.5, 1, 2]
 
 
-@pytest.mark.parametrize("label_cut", [pytest.param(i, id=f"fill_type={i.name}") for i in DrawerHandleLabelCut])
+@pytest.mark.parametrize("label_cut", [pytest.param(i, id=f"label_cut={i.name}") for i in DrawerHandleLabelCut])
 @pytest.mark.parametrize("fill_type", [pytest.param(i, id=f"fill_type={i.name}") for i in DrawerFill])
 @pytest.mark.parametrize("width", [pytest.param(i, id=f"width={i}") for i in GOOD_WIDTHS])
 @pytest.mark.parametrize("depth", [pytest.param(i, id=f"depth={i}") for i in GOOD_DEPTHS])
