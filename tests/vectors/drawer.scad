@@ -8,6 +8,7 @@ unit_depth = 1;
 height = 10;
 wall_thickness = 1;
 fill_type = SQUARE_CUT;
+label_cut = NO_LABEL_CUT;
 
 
 Drawer(
@@ -17,5 +18,6 @@ Drawer(
         height=height
     ),
     drawer_wall=wall_thickness,
-    fill_type=fill_type
+    fill_type=fill_type,
+    label_cut=label_cut
 );
