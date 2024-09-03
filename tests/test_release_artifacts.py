@@ -1,5 +1,12 @@
 import pytest
-from . import report, vector_runner, CabinetBases, CabinetTops, ScrewfinityStandardDrawerHeights
+from . import (
+    report,
+    vector_runner,
+    CabinetBases,
+    CabinetTops,
+    DrawerFill,
+    ScrewfinityStandardDrawerHeights,
+)
 
 
 def small_cabinets():
@@ -121,6 +128,51 @@ def test_screwfinity_cabinets(request, width, depth, drawer_width, drawer_height
             "rows": rows,
             "base_style": CabinetBases.GRIDFINITY_BASE,
             "top_style": top,
+        },
+        output_suffix=request.node.callspec.id,
+        extension="stl",
+    )
+    runner.run()
+    report(runner)
+    assert(runner.good())
+
+
+def screwfinity_drawers():
+    for height in ScrewfinityStandardDrawerHeights:
+        yield pytest.param(
+            1,
+            2,
+            height,
+            id=f"Screwfinity {height.name} 2U drawer"
+        )
+    yield pytest.param(
+        2,
+        2,
+        ScrewfinityStandardDrawerHeights.MEDIUM,
+        id=f"Screwfinity MEDIUM WIDE 2U drawer"
+    )
+    yield pytest.param(
+        2,
+        4,
+        ScrewfinityStandardDrawerHeights.MEDIUM,
+        id=f"Screwfinity MEDIUM WIDE 4U drawer"
+    )
+
+
+@pytest.mark.compatibility
+@pytest.mark.parametrize("width, depth, height", screwfinity_drawers())
+@pytest.mark.parametrize("fill_type", [pytest.param(i, id=f"fill_type={i.name}") for i in [
+    DrawerFill.SQUARE_CUT,
+    DrawerFill.SCOOP_CUT,
+]])
+def test_screwfinity_drawers(request, width, depth, height, fill_type):
+    runner = vector_runner(
+        name="screwfinity-drawer",
+        parameters={
+            "unit_width": width,
+            "unit_depth": depth,
+            "height": height,
+            "fill_type": fill_type,
         },
         output_suffix=request.node.callspec.id,
         extension="stl",
