@@ -9,8 +9,6 @@ use <./MCAD/triangles.scad>;
  */
 module Lip(footprint, cross_section, center=false) {
     tan_angle = atan(cross_section.y / cross_section.x);
-    echo(str("cross section: ", cross_section));
-    echo(str("tan angle: ", tan_angle));
 
     translate(center ? [-1 * footprint.x / 2, -1 * footprint.y / 2, -1 * cross_section.y / 2] : [0, 0, 0]) {
         rotate([-90, -90, 0]) {
