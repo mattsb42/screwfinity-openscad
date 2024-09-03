@@ -53,6 +53,12 @@ jobs:
               uses: actions/download-artifact@v4.1.8
               with:
                 path: artifacts/
+            - name: "re-package artifacts"
+              run: "./ci/package-artifacts.sh artifacts"
             - run: "find ./"
+            - uses: actions/upload-artifact@v4.4.0
+              with:
+                path: "artifacts/*.zip"
+                if-no-files-found: "error"
             # - name: "create release from tag"
             #   uses: softprops/action-gh-release@v2.0.8
