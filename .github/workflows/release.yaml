@@ -16,8 +16,8 @@ jobs:
                 target:
                     # temporarily disable long-running jobs to test
                     # - "screwfinity_large"
-                    - "screwfinity_medium"
-                    # - "screwfinity_medium_wide"
+                    # - "screwfinity_medium"
+                    - "screwfinity_medium_wide"
                     # - "screwfinity_small"
                     - "screwfinity_medium_wide_4u"
         runs-on: "ubuntu-latest"
