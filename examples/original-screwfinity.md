@@ -26,7 +26,8 @@ Drawer(
         unit_depth=2,
         height=MEDIUM
     ),
-    fill_type=SQUARE_CUT
+    fill_type=SQUARE_CUT,
+    label_cut=LABEL_CUT
 );
 ```
 
@@ -52,7 +53,8 @@ Drawer(
         unit_depth=2,
         height=MEDIUM
     ),
-    fill_type=SCOOP_CUT
+    fill_type=SCOOP_CUT,
+    label_cut=LABEL_CUT
 );
 ```
 
@@ -78,7 +80,8 @@ Drawer(
         unit_depth=2,
         height=SMALL
     ),
-    fill_type=SCOOP_CUT
+    fill_type=SCOOP_CUT,
+    label_cut=LABEL_CUT
 );
 ```
 
@@ -104,7 +107,8 @@ Drawer(
         unit_depth=2,
         height=LARGE
     ),
-    fill_type=SCOOP_CUT
+    fill_type=SCOOP_CUT,
+    label_cut=LABEL_CUT
 );
 ```
 
@@ -127,7 +131,8 @@ Drawer(
         unit_depth=2,
         height=MEDIUM
     ),
-    fill_type=SCOOP_CUT
+    fill_type=SCOOP_CUT,
+    label_cut=LABEL_CUT
 );
 ```
 
