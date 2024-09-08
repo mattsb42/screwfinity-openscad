@@ -9,6 +9,7 @@ openscad-runner = "*"
 ruff = "*"
 setuptools = "*"
 nox = "*"
+pytest-xdist = {extras = ["psutil"], version = "*"}
 
 [dev-packages]
 

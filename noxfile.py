@@ -6,10 +6,12 @@ TEST_DEPENDENCIES = [
     "pytest",
     "openscad-runner",
     "setuptools",
+    "pytest-xdist[psutil]",
 ]
 ENV = {}
 HERE = Path(__file__).parent.resolve()
 BUILD_VECTORS = HERE / "build" / "vectors"
+PYTEST_COMMAND = ["pytest", "-n", "logical"]
 
 
 def setup_environment(session):
@@ -30,6 +32,8 @@ def clean_build():
 def test(session):
     setup_environment(session)
     clean_build()
+    # NOTE: We do not want to paralellize the test,
+    # mainly because pytest-xdist makes the output less clear.
     session.run("pytest", "-k", "not compatibility", "-v", env=ENV)
 
 
@@ -37,7 +41,7 @@ def test(session):
 def compatibility(session):
     setup_environment(session)
     clean_build()
-    session.run("pytest", "-k", "compatibility", "-v", env=ENV)
+    session.run(*PYTEST_COMMAND, "-k", "compatibility", "-v", env=ENV)
 
 
 @nox.session
@@ -51,4 +55,4 @@ def compatibility(session):
 def artifacts(session, marker):
     setup_environment(session)
     clean_build()
-    session.run("pytest", "-k", marker, "-v", env=ENV)
+    session.run(*PYTEST_COMMAND, "-k", marker, "-v", env=ENV)
