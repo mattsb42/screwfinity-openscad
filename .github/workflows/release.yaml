@@ -6,6 +6,7 @@ on:
 
 env:
     USE_PYTHON_VERSION: "3.12.5"
+    ARTIFACTS_DIRECTORY: ".artifacts"
 
 jobs:
     build-artifacts:
@@ -53,11 +54,11 @@ jobs:
             - name: "download all artifacts"
               uses: actions/download-artifact@v4.1.8
               with:
-                path: .artifacts/
+                path: "${{ env.ARTIFACTS_DIRECTORY }}/"
             - name: "re-package artifacts"
-              run: "./ci/package-artifacts.sh .artifacts"
-            - run: "find .artifacts/ -type f -name \"*.zip\""
+              run: "./ci/package-artifacts.sh ${{ env.ARTIFACTS_DIRECTORY }}"
+            - run: "find ${{ env.ARTIFACTS_DIRECTORY }}/ -type f -name \"*.zip\""
             - name: "create release from tag"
               uses: softprops/action-gh-release@v2.0.8
               with:
-                files: "./artifacts/*.zip"
+                files: "./${{ env.ARTIFACTS_DIRECTORY }}/*.zip"
