@@ -1,9 +1,8 @@
 name: "release artifacts"
 on:
     push:
-        branches: ["main"]
-        # tags:
-        #     - "v[0-9]+.[0-9]+.[0-9]+"
+        tags:
+            - "v[0-9]+.[0-9]+.[0-9]+"
 
 env:
     USE_PYTHON_VERSION: "3.12.5"
@@ -46,6 +45,8 @@ jobs:
 
     create-release:
         needs: build-artifacts
+        permissions:
+          contents: write
         runs-on: "ubuntu-latest"
         steps:
             - uses: actions/checkout@v4.1.7
@@ -55,10 +56,8 @@ jobs:
                 path: .artifacts/
             - name: "re-package artifacts"
               run: "./ci/package-artifacts.sh .artifacts"
-            - run: "find ./"
-            - uses: actions/upload-artifact@v4.4.0
+            - run: "find .artifacts/ -type f -name \"*.zip\""
+            - name: "create release from tag"
+              uses: softprops/action-gh-release@v2.0.8
               with:
-                path: ".artifacts/*.zip"
-                if-no-files-found: "error"
-            # - name: "create release from tag"
-            #   uses: softprops/action-gh-release@v2.0.8
+                files: "./artifacts/*.zip"
