@@ -1,6 +1,7 @@
 include <./constants.scad>;
 include <./options.scad>;
 include <./drawer-handles.scad>;
+include <./drawer-cutouts.scad>;
 use <./util.scad>;
 use <./MCAD/boxes.scad>;
 
@@ -117,38 +118,6 @@ module Drawer(dimensions, drawer_wall=1, fill_type=SQUARE_CUT, label_cut=NO_LABE
         }
     }
 
-    module SquareCutoutRear() {
-        translate([0, -1 * inside.y / 4, 0])
-            roundedCube(size=[inside.x, inside.y / 2, inside.z], r=body_chamfer, sidesonly=true, center=true);
-    }
-
-    module SquareCutoutFront() {
-        translate([0, inside.y / 4, 0])
-            roundedCube(size=[inside.x, inside.y / 2, inside.z], r=body_chamfer, sidesonly=true, center=true);
-    }
-
-    module SquareCutout() {
-        hull() {
-            SquareCutoutFront();
-            SquareCutoutRear();       
-        }
-    }
-
-    module ScoopCutout() {
-        module Scoop() {
-            intersection() {
-                translate([0, (inside.y / 2) - inside.z, inside.z / 2])
-                    rotate([0, 90, 0])
-                        cylinder(h=inside.x, r=inside.z, center=true);
-                SquareCutoutFront();
-            }
-        }
-        hull() {
-            Scoop();
-            SquareCutoutRear();
-        }
-    }
-
     // block out the edges of the side walls to slice off any overhangs
     module SideWallSlice() {
         // add a tiny slice to intersect with the wall and avoid rendering artifacts
@@ -170,8 +139,8 @@ module Drawer(dimensions, drawer_wall=1, fill_type=SQUARE_CUT, label_cut=NO_LABE
                 );
         }
         translate([0, 0, (drawer_wall / 2)]) {
-            if (fill_type == SQUARE_CUT) SquareCutout();
-            else if (fill_type == SCOOP_CUT) ScoopCutout();
+            if (fill_type == SQUARE_CUT) SquareCutout(dimensions=inside, chamfer=body_chamfer);
+            else if (fill_type == SCOOP_CUT) ScoopCutout(dimensions=inside, chamfer=body_chamfer);
         }
         SideWallSlice();
         // slice off everything above the top
