@@ -81,3 +81,29 @@ def test_invalid_label_cut():
     report(runner)
     assert(not runner.good())
     assert_error_present(runner, "Invalid label cut type")
+
+
+def test_invalid_handle_style():
+    runner = vector_runner(
+        name="drawer",
+        parameters={
+            "handle_style": -1,
+        },
+    )
+    runner.run()
+    report(runner)
+    assert(not runner.good())
+    assert_error_present(runner, "Invalid handle style")
+
+
+def test_invalid_handle_depth():
+    runner = vector_runner(
+        name="drawer",
+        parameters={
+            "handle_depth": -1,
+        },
+    )
+    runner.run()
+    report(runner)
+    assert(not runner.good())
+    assert_error_present(runner, "Invalid handle depth")

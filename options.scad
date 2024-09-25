@@ -8,9 +8,12 @@ NO_CUT = 0;
 SCOOP_CUT = 1;
 SQUARE_CUT = 2;
 
-// Drawer handle options
+// Drawer label options
 NO_LABEL_CUT = 0;
 LABEL_CUT = 1;
+
+// Drawer handle options
+TRIANGLE_HANDLE = 1;
 
 // Cabinet base options
 NO_BASE = 0;

@@ -9,6 +9,8 @@ height = 10;
 wall_thickness = 1;
 fill_type = SQUARE_CUT;
 label_cut = NO_LABEL_CUT;
+handle_style = TRIANGLE_HANDLE;
+handle_depth = 8;
 
 
 Drawer(
@@ -19,5 +21,6 @@ Drawer(
     ),
     drawer_wall=wall_thickness,
     fill_type=fill_type,
-    label_cut=label_cut
+    label_cut=label_cut,
+    handle_options=[handle_style, handle_depth]
 );
