@@ -34,14 +34,14 @@ def test(session):
     clean_build()
     # NOTE: We do not want to paralellize the test,
     # mainly because pytest-xdist makes the output less clear.
-    session.run("pytest", "-k", "not compatibility", "-v", env=ENV)
+    session.run("pytest", "-k", "not compatibility", "-v", *session.posargs, env=ENV)
 
 
 @nox.session
 def compatibility(session):
     setup_environment(session)
     clean_build()
-    session.run(*PYTEST_COMMAND, "-k", "compatibility", "-v", env=ENV)
+    session.run(*PYTEST_COMMAND, "-k", "compatibility", "-v", *session.posargs, env=ENV)
 
 
 @nox.session
