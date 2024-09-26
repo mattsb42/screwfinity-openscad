@@ -54,6 +54,66 @@ function cell(style, colspan=1, rowspan=1) =
     )
     [style, colspan, rowspan];
 
+function grid(dimensions, row_data) =
+    let(x=2)
+    let(
+        column_count=dimensions.x,
+        row_count=dimensions.y,
+        column_width=(1 / column_count),
+        row_height=(1 / row_count)
+    )
+    [
+        for (row_index = [0:len(row_data) - 1])
+            for (cell_index = [0:len(row_data[row_index]) - 1])
+                let(
+                    row_cell=row_data[row_index][cell_index],
+                    style=row_cell[0],
+                    colspan=row_cell[1],
+                    rowspan=row_cell[2],
+                    column_offset_within_row=cell_starting_column(sub_vector(row_data[row_index], cell_index)),
+                    column_offset_from_previous_rows=cumulative_column_offset_from_higher_rows(
+                        row_data=row_data,
+                        cell_location=[cell_index, row_index]
+                    ),
+                    // column_offset_from_previous_rows=0,
+                    column_offset=column_offset_from_previous_rows+column_offset_within_row
+                )
+                assert(
+                    (column_offset + colspan) <= column_count,
+                    str(
+                        "ERROR: Exceeded grid columns on cell ",
+                        cell_index,
+                        " in row ",
+                        row_index,
+                        " with column offset ",
+                        column_offset,
+                        " and requested column span ",
+                        colspan
+                    )
+                )
+                assert(
+                    (row_index + (rowspan - 1)) <= row_count,
+                    str(
+                        "ERROR: Exceeded grid rows on cell ",
+                        cell_index,
+                        " in row ",
+                        row_index
+                    )
+                )
+                [
+                    // x offset from home to center of cell
+                    (column_width * column_offset) + (column_width * colspan / 2),
+                    // y offset from home to center of cell
+                    (row_height * row_index) + (row_height * rowspan / 2),
+                    // cell x percentage of grid
+                    colspan / column_count,
+                    // cell y percentage of grid
+                    rowspan / row_count,
+                    // cell style
+                    style
+                ]
+    ];
+
 /**
 Calculates the x offset of the left edge of a cell,
 based on the colspan values of the previous cells in the row.
@@ -129,63 +189,3 @@ function cumulative_column_offset_from_higher_rows(
         check_location=next_check,
         running_sum=running_sum + additional_offset
     );
-
-function grid(dimensions, row_data) =
-    let(x=2)
-    let(
-        column_count=dimensions.x,
-        row_count=dimensions.y,
-        column_width=(1 / column_count),
-        row_height=(1 / row_count)
-    )
-    [
-        for (row_index = [0:len(row_data) - 1])
-            for (cell_index = [0:len(row_data[row_index]) - 1])
-                let(
-                    row_cell=row_data[row_index][cell_index],
-                    style=row_cell[0],
-                    colspan=row_cell[1],
-                    rowspan=row_cell[2],
-                    column_offset_within_row=cell_starting_column(sub_vector(row_data[row_index], cell_index)),
-                    column_offset_from_previous_rows=cumulative_column_offset_from_higher_rows(
-                        row_data=row_data,
-                        cell_location=[cell_index, row_index]
-                    ),
-                    // column_offset_from_previous_rows=0,
-                    column_offset=column_offset_from_previous_rows+column_offset_within_row
-                )
-                assert(
-                    (column_offset + colspan) <= column_count,
-                    str(
-                        "ERROR: Exceeded grid columns on cell ",
-                        cell_index,
-                        " in row ",
-                        row_index,
-                        " with column offset ",
-                        column_offset,
-                        " and requested column span ",
-                        colspan
-                    )
-                )
-                assert(
-                    (row_index + (rowspan - 1)) <= row_count,
-                    str(
-                        "ERROR: Exceeded grid rows on cell ",
-                        cell_index,
-                        " in row ",
-                        row_index
-                    )
-                )
-                [
-                    // x offset from home to center of cell
-                    (column_width * column_offset) + (column_width * colspan / 2),
-                    // y offset from home to center of cell
-                    (row_height * row_index) + (row_height * rowspan / 2),
-                    // cell x percentage of grid
-                    colspan / column_count,
-                    // cell y percentage of grid
-                    rowspan / row_count,
-                    // cell style
-                    style
-                ]
-    ];
