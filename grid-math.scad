@@ -54,11 +54,18 @@ function cell(style, colspan=1, rowspan=1) =
     )
     [style, colspan, rowspan];
 
-function grid(dimensions, row_data) =
+/**
+Create a grid of cells.
+grid draws heavily from HTML Tables.
+Cells and rows behave basically the same,
+including how rowspan affects cells defined in lower rows.
+
+Returns an array of cell offset descriptions
+that Drawer and Cabinet understand.
+*/
+function grid(row_count, column_count, row_data) =
     let(x=2)
     let(
-        column_count=dimensions.x,
-        row_count=dimensions.y,
         column_width=(1 / column_count),
         row_height=(1 / row_count)
     )
