@@ -89,7 +89,7 @@ Collects all column offsets from row-spanning cells in higher rows
 that affect the target cell.
 */
 function cumulative_column_offset_from_higher_rows(
-    rows,
+    row_data,
     cell_location,
     check_location=[0, 0],
     running_sum=0) =
@@ -97,7 +97,7 @@ function cumulative_column_offset_from_higher_rows(
     check_location.y == cell_location.y
     ? running_sum
     : let(
-        check_offset=column_offset_on_lower_rows(check_location, rows[check_location.x][check_location.y]),
+        check_offset=column_offset_on_lower_rows(check_location, row_data[check_location.x][check_location.y]),
         first_affected=check_offset[0],
         last_affected=check_offset[1],
         potential_offset=check_offset[2],
@@ -118,13 +118,13 @@ function cumulative_column_offset_from_higher_rows(
         next_check=
             // If there are still cells in row,
             // step to the right.
-            (check_location.x + 1) < len(rows[check_location.y])
+            (check_location.x + 1) < len(row_data[check_location.y])
             ? [check_location.x + 1, check_location.y]
             // Otherwise, step down to the start of the next column.
             : [0, check_location.y + 1]
     )
     cumulative_column_offset_from_higher_rows(
-        rows=rows,
+        row_data=row_data,
         cell_location=cell_location,
         check_location=next_check,
         running_sum=running_sum + additional_offset
@@ -133,10 +133,10 @@ function cumulative_column_offset_from_higher_rows(
 function grid(dimensions, row_data) =
     let(x=2)
     let(
-        columns=dimensions.x,
-        rows=dimensions.y,
-        column_width=(1 / columns),
-        row_height=(1 / rows)
+        column_count=dimensions.x,
+        row_count=dimensions.y,
+        column_width=(1 / column_count),
+        row_height=(1 / row_count)
     )
     [
         for (row_index = [0:len(row_data) - 1])
@@ -148,14 +148,14 @@ function grid(dimensions, row_data) =
                     rowspan=row_cell[2],
                     column_offset_within_row=cell_starting_column(sub_vector(row_data[row_index], cell_index)),
                     column_offset_from_previous_rows=cumulative_column_offset_from_higher_rows(
-                        rows=row_data,
+                        row_data=row_data,
                         cell_location=[cell_index, row_index]
                     ),
                     // column_offset_from_previous_rows=0,
                     column_offset=column_offset_from_previous_rows+column_offset_within_row
                 )
                 assert(
-                    (column_offset + colspan) <= columns,
+                    (column_offset + colspan) <= column_count,
                     str(
                         "ERROR: Exceeded grid columns on cell ",
                         cell_index,
@@ -168,7 +168,7 @@ function grid(dimensions, row_data) =
                     )
                 )
                 assert(
-                    (row_index + (rowspan - 1)) <= rows,
+                    (row_index + (rowspan - 1)) <= row_count,
                     str(
                         "ERROR: Exceeded grid rows on cell ",
                         cell_index,
@@ -182,9 +182,9 @@ function grid(dimensions, row_data) =
                     // y offset from home to center of cell
                     (row_height * row_index) + (row_height * rowspan / 2),
                     // cell x percentage of grid
-                    colspan / columns,
+                    colspan / column_count,
                     // cell y percentage of grid
-                    rowspan / rows,
+                    rowspan / row_count,
                     // cell style
                     style
                 ]
