@@ -28,8 +28,6 @@ and drawers (cut style for drawer cutouts)
 
 Grids are composed of cells,
 and cells can span both columns and rows.
-While cells cannot span fractional rows,
-they can span fractional columns.
 */
 
 /**
@@ -37,6 +35,7 @@ Create a cell.
 A cell is the fundamental unit of a grid.
 Cells can have a style
 and can span both columns and rows.
+Both colspan and rowspan MUST be positive integers.
 */
 function cell(style, colspan=1, rowspan=1) =
     assert(
@@ -47,9 +46,9 @@ function cell(style, colspan=1, rowspan=1) =
         )
     )
     assert(
-        colspan > 0,
+        colspan > 0 && colspan % 1 == 0,
         str(
-            "ERROR: colspan MUST be positiive: ",
+            "ERROR: colspan MUST be a positiive integer: ",
             colspan
         )
     )
