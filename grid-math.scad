@@ -64,7 +64,20 @@ Returns an array of cell offset descriptions
 that Drawer and Cabinet understand.
 */
 function grid(row_count, column_count, row_data) =
-    let(x=2)
+    assert(
+        row_count > 0 && row_count % 1 == 0,
+        str(
+            "ERROR: row_count MUST be a positive integer: ",
+            row_count
+        )
+    )
+    assert(
+        column_count > 0 && column_count % 1 == 0,
+        str(
+            "ERROR: column_count MUST be a positive integer: ",
+            column_count
+        )
+    )
     let(
         column_width=(1 / column_count),
         row_height=(1 / row_count)
@@ -82,7 +95,6 @@ function grid(row_count, column_count, row_data) =
                         row_data=row_data,
                         cell_location=[cell_index, row_index]
                     ),
-                    // column_offset_from_previous_rows=0,
                     column_offset=column_offset_from_previous_rows+column_offset_within_row
                 )
                 assert(
