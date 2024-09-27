@@ -67,12 +67,11 @@ function uniform_grid(row_count, column_count, style) = grid(
     row_count=row_count,
     column_count=column_count,
     row_data=[
-        for (row_index = [1:row_count]) [
+        for (row_index = [1:row_count])
             uniform_row_data(
                 column_count=column_count,
                 style=style
             )
-        ]
     ]
 );
 
@@ -88,7 +87,7 @@ Each cell is one column wide.
 */
 function uniform_row_data(column_count, style) = [
     for (cell_index = [1:column_count])
-                cell(style=style, colspan=1, rowspan=1)
+        cell(style=style, colspan=1, rowspan=1)
 ];
 
 /**
@@ -234,7 +233,7 @@ function cumulative_column_offset_from_higher_rows(
         next_check=
             // If there are still cells in row,
             // step to the right.
-            (check_location.x + 1) < len(row_data[check_location.y])
+            (check_location.x + 1) < len(row_data[check_location.y]) - 1
             ? [check_location.x + 1, check_location.y]
             // Otherwise, step down to the start of the next column.
             : [0, check_location.y + 1]
