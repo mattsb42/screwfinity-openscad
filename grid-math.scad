@@ -55,6 +55,43 @@ function cell(style, colspan=1, rowspan=1) =
     [style, colspan, rowspan];
 
 /**
+Create a uniform grid of cells.
+
+Every cell is the same,
+and they are uniformly distributed
+across the rows and columns.
+
+Each cell is one column wide and one row tall.
+*/
+function uniform_grid(row_count, column_count, style) = grid(
+    row_count=row_count,
+    column_count=column_count,
+    row_data=[
+        for (row_index = [1:row_count]) [
+            uniform_row_data(
+                column_count=column_count,
+                style=style
+            )
+        ]
+    ]
+);
+
+/**
+Create row_data for a uniform row of cells.
+
+This is a helper for input to grid()
+if you want a row where all the the cells are the same.
+
+Every cell is the same.
+
+Each cell is one column wide.
+*/
+function uniform_row_data(column_count, style) = [
+    for (cell_index = [1:column_count])
+                cell(style=style, colspan=1, rowspan=1)
+];
+
+/**
 Create a grid of cells.
 grid draws heavily from HTML Tables.
 Cells and rows behave basically the same,
