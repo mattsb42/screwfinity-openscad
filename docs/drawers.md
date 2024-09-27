@@ -15,8 +15,10 @@ Drawer(
         height=40
     ),
     drawer_wall=1, // default
-    fill_type=SQUARE_CUT, // default
-    handle_options=bundle_handle_options(
+    fill_properties=fill_properties(
+      style=SQUARE_CUT
+    ), // default
+    handle_properties=handle_properties(
       label_cut=NO_LABEL_CUT // default
     )
 );
@@ -60,22 +62,39 @@ but if you want to change that,
 you can set any mm value you like
 (within the capabilities of your printer, of course.)
 
-## fill_type
+## fill_properties
 
-What do you want the interior of your drawer to be?
-You can find these values in `options.scad`.
+What do you want the interior cutouts of your drawer to be?
 
-- `SQUARE_CUT` :
-  Standard full cutout.
-  This gives you the most usable volume,
-  but can be hard to manage with small parts.
-- `SCOOP_CUT` :
-  Makes a sloping cut up to the front wall.
-  This can make it a lot easier to handle small parts.
-- `NO_CUT` :
-  Leaves the drawer body solid,
-  with no cutout.
-  Use this if you want to make your own custom drawers.
+You can either define a cutout style
+using values in `options.scad`
+or you can define a grid,
+supplying a style for each cell.
+
+You MUST define exactly one of `style` or `grid`.
+
+- `style` :
+  If you want a simple cutout of the entire drawer,
+  just specify the cutout style.
+  In grid terms,
+  this provides a 1x1 grid.
+
+  - `SQUARE_CUT` :
+    Standard full cutout.
+    This gives you the most usable volume,
+    but can be hard to manage with small parts.
+  - `SCOOP_CUT` :
+    Makes a sloping cut up to the front wall.
+    This can make it a lot easier to handle small parts.
+  - `NO_CUT` :
+    Leaves the drawer body solid,
+    with no cutout.
+    Use this if you want to make your own custom drawers.
+
+- `grid` :
+  Use this if you want a complex grid.
+  Provide the output of `grid()` or `uniform_grid()`
+  from `grid.scad`.
 
 ## handle_properties
 

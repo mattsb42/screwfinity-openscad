@@ -67,7 +67,7 @@ def test_drawer_invalid_fill_type():
     runner.run()
     report(runner)
     assert(not runner.good())
-    assert_error_present(runner, "Invalid fill type")
+    assert_error_present(runner, "Invalid cell cut type")
 
 
 def test_invalid_label_cut():

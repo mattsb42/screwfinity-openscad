@@ -2,6 +2,7 @@ include <./constants.scad>;
 include <./options.scad>;
 include <./drawer-handles.scad>;
 include <./drawer-cutouts.scad>;
+include <./grid.scad>;
 use <./util.scad>;
 use <./MCAD/boxes.scad>;
 
@@ -24,7 +25,40 @@ function drawer_options(unit_width, unit_depth, height) = [unit_width, unit_dept
 /**
 Helper to assemble a handle properties structure.
 */
-function handle_properties(style=TRIANGLE_HANDLE, depth=DEFAULT_HANDLE_DEPTH, label_cut=NO_LABEL_CUT) = [style, depth, label_cut];
+function handle_properties(
+    style=TRIANGLE_HANDLE,
+    depth=DEFAULT_HANDLE_DEPTH,
+    label_cut=NO_LABEL_CUT
+) = [style, depth, label_cut];
+
+/**
+Helper to assemble fill properties for a drawer.
+*/
+function fill_properties(
+    style=undef,
+    grid=undef
+) =
+    assert(
+        !(style == undef && grid == undef),
+        str(
+            "ERROR: Neither style nor grid are set for fill_properties. ",
+            "Provide exactly one."
+        )
+    )
+    assert(
+        style == undef || grid == undef,
+        str(
+            "ERROR: Both style and grid are set for fill_properties. ",
+            "Provide exactly one."
+        )
+    )
+    grid != undef
+    ? grid
+    : uniform_grid(
+        row_count=1,
+        column_count=1,
+        style=style
+    );
 
 function drawer_outside_dimensions(dimensions) = [
     (dimensions.x * GRIDFINITY_GRID_LENGTH) - GU_TO_DU - (DRAWER_TOLERANCE * 2),
@@ -32,9 +66,15 @@ function drawer_outside_dimensions(dimensions) = [
     dimensions.z,
 ];
 
-module Drawer(dimensions, drawer_wall=1, fill_type=SQUARE_CUT, handle_properties=handle_properties()) {
+module Drawer(
+    dimensions,
+    drawer_wall=1,
+    fill_properties=fill_properties(style=SQUARE_CUT),
+    handle_properties=handle_properties()
+) {
 
 
+    fill_type = SCOOP_CUT;
     minimum_interior_width = 0.1;
     body_chamfer = 1;
 
@@ -55,14 +95,15 @@ module Drawer(dimensions, drawer_wall=1, fill_type=SQUARE_CUT, handle_properties
         )
     );
 
-    assert(
-        fill_type == NO_CUT || fill_type == SQUARE_CUT || fill_type == SCOOP_CUT,
-        str(
-            "ERROR: Invalid fill type ",
-            fill_type
-        )
-    );
-
+    for(cell = fill_properties)
+        let(style=cell[4])
+        assert(
+            style == NO_CUT || style == SQUARE_CUT || style == SCOOP_CUT,
+            str(
+                "ERROR: Invalid cell cut type ",
+                style
+            )
+        );
 
     assert(
         len(handle_properties) == 3,
@@ -137,6 +178,51 @@ module Drawer(dimensions, drawer_wall=1, fill_type=SQUARE_CUT, handle_properties
             cube([10, outside_dimensions.y * 2, outside_dimensions.z * 2], center=true);
     }
 
+    module Cutouts() {
+        // reset to the top left
+        // because that's what grid-math assumes
+        let(
+            fill_outside_dimensions=[
+                outside_dimensions.x - drawer_wall,
+                outside_dimensions.y - drawer_wall,
+                outside_dimensions.z
+            ]
+        )
+        translate([
+            fill_outside_dimensions.x / 2 * -1,
+            fill_outside_dimensions.y / 2 * -1,
+            0
+        ])
+        for (cut = fill_properties)
+            let(
+                x_offset=cut[0],
+                y_offset=cut[1],
+                x_percentage=cut[2],
+                y_percentage=cut[3],
+                style=cut[4]
+            )
+            translate([
+                // For reasons that don't grok in my brain right now,
+                // the grid is rotated 180 degrees on the y axis.
+                // This means that we have to reverse the x coordinate
+                // or we get a mirror image of what we intended.
+                fill_outside_dimensions.x - (fill_outside_dimensions.x * x_offset),
+                fill_outside_dimensions.y * y_offset,
+                (drawer_wall / 2)
+            ])
+            let(
+                cut_dimensions=[
+                    (fill_outside_dimensions.x * x_percentage) - drawer_wall,
+                    (fill_outside_dimensions.y * y_percentage) - drawer_wall,
+                    fill_outside_dimensions.z - drawer_wall
+                ]
+            )
+            color("red"){
+                if (style == SQUARE_CUT) SquareCutout(dimensions=cut_dimensions, chamfer=body_chamfer);
+                else if (style == SCOOP_CUT) ScoopCutout(dimensions=cut_dimensions, chamfer=body_chamfer);
+            }
+    }
+
     difference() {
         union() {
             Body();
@@ -147,10 +233,7 @@ module Drawer(dimensions, drawer_wall=1, fill_type=SQUARE_CUT, handle_properties
                     handle_depth=handle_depth
                 );
         }
-        translate([0, 0, (drawer_wall / 2)]) {
-            if (fill_type == SQUARE_CUT) SquareCutout(dimensions=inside, chamfer=body_chamfer);
-            else if (fill_type == SCOOP_CUT) ScoopCutout(dimensions=inside, chamfer=body_chamfer);
-        }
+        Cutouts();
         SideWallSlice();
         // slice off everything above the top
         translate([0, 0, (outside_dimensions.z / 2) + (drawer_wall) + 0.001])

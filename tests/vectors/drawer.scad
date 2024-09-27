@@ -20,7 +20,9 @@ Drawer(
         height=height
     ),
     drawer_wall=wall_thickness,
-    fill_type=fill_type,
+    fill_properties=fill_properties(
+        style=fill_type
+    ),
     handle_properties=handle_properties(
         style=handle_style,
         depth=handle_depth,
