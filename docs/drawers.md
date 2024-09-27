@@ -16,7 +16,9 @@ Drawer(
     ),
     drawer_wall=1, // default
     fill_type=SQUARE_CUT, // default
-    label_cut=NO_LABEL_CUT // default
+    handle_options=bundle_handle_options(
+      label_cut=NO_LABEL_CUT // default
+    )
 );
 
 ```
@@ -75,13 +77,36 @@ You can find these values in `options.scad`.
   with no cutout.
   Use this if you want to make your own custom drawers.
 
-## label_cut
+## handle_properties
 
-Do you want to have a window and slot for a label?
-You can find these values in `options.scad`.
+Controls how the properties of the handle.
+Use the `handle_properties` helper function to generate this.
 
-- `NO_LABEL_CUT` :
-  Leave the handle solid.
-- `LABEL_CUT` :
-  Cut a slot to fit a label,
-  along with a window to view the label.
+- **style** :
+  The handle style you want.
+  You can find these values in `options.scad`.
+
+  - `TRIANGLE_HANDLE` :
+    Similar to the original Screwfinity handle,
+    this handle is a triangular shape
+    with a peak halfway up the drawer,
+    a ledge underneath
+    that provides a grip point,
+    and a label slot along the top-facing surface.
+    _Default_
+
+- **depth** :
+  The handle depth,
+  from the front of the handle
+  to the front of the drawer body.
+  _Default: 8_
+
+- **label_cut** :
+  How/should the handle have a cutout for a label?
+  You can find these values in `options.scad`.  
+
+  - `NO_LABEL_CUT` :
+    Leave the handle solid.
+  - `LABEL_CUT` :
+    Cut a slot to fit a label,
+    along with a window to view the label.

@@ -21,6 +21,9 @@ Drawer(
     ),
     drawer_wall=wall_thickness,
     fill_type=fill_type,
-    label_cut=label_cut,
-    handle_options=[handle_style, handle_depth]
+    handle_properties=handle_properties(
+        style=handle_style,
+        depth=handle_depth,
+        label_cut=label_cut
+    )
 );

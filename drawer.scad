@@ -15,9 +15,16 @@ LABEL_SLOT_FACE_OFFSET = 0.5;
 // distance from front face of drawer to outer edge of handle
 DEFAULT_HANDLE_DEPTH = 8;
 
-function drawer_options (unit_width, unit_depth, height) = [unit_width, unit_depth, height];
 
-function bundle_handle_options (style=TRIANGLE_HANDLE, depth=DEFAULT_HANDLE_DEPTH) = [style, depth];
+/**
+Helper to assemble a drawer options structure.
+*/
+function drawer_options(unit_width, unit_depth, height) = [unit_width, unit_depth, height];
+
+/**
+Helper to assemble a handle properties structure.
+*/
+function handle_properties(style=TRIANGLE_HANDLE, depth=DEFAULT_HANDLE_DEPTH, label_cut=NO_LABEL_CUT) = [style, depth, label_cut];
 
 function drawer_outside_dimensions(dimensions) = [
     (dimensions.x * GRIDFINITY_GRID_LENGTH) - GU_TO_DU - (DRAWER_TOLERANCE * 2),
@@ -25,7 +32,7 @@ function drawer_outside_dimensions(dimensions) = [
     dimensions.z,
 ];
 
-module Drawer(dimensions, drawer_wall=1, fill_type=SQUARE_CUT, label_cut=NO_LABEL_CUT, handle_options=bundle_handle_options()) {
+module Drawer(dimensions, drawer_wall=1, fill_type=SQUARE_CUT, handle_properties=handle_properties()) {
 
 
     minimum_interior_width = 0.1;
@@ -56,23 +63,16 @@ module Drawer(dimensions, drawer_wall=1, fill_type=SQUARE_CUT, label_cut=NO_LABE
         )
     );
 
+
     assert(
-        label_cut == NO_LABEL_CUT || label_cut == LABEL_CUT,
+        len(handle_properties) == 3,
         str(
-            "ERROR: Invalid label cut type",
-            label_cut
+            "ERROR: Invalid handle properties length",
+            len(handle_properties)
         )
     );
 
-    assert(
-        len(handle_options) == 2,
-        str(
-            "ERROR: Invalid handle options length",
-            len(handle_options)
-        )
-    );
-
-    handle_style = handle_options[0];
+    handle_style = handle_properties[0];
     assert(
         handle_style == TRIANGLE_HANDLE,
         str(
@@ -81,12 +81,21 @@ module Drawer(dimensions, drawer_wall=1, fill_type=SQUARE_CUT, label_cut=NO_LABE
         )
     );
 
-    handle_depth = handle_options[1];
+    handle_depth = handle_properties[1];
     assert(
         handle_depth > 0,
         str(
             "ERROR: Invalid handle depth",
             handle_depth
+        )
+    );
+
+    label_cut = handle_properties[2];
+    assert(
+        label_cut == NO_LABEL_CUT || label_cut == LABEL_CUT,
+        str(
+            "ERROR: Invalid label cut type",
+            label_cut
         )
     );
 
