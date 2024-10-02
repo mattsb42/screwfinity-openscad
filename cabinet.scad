@@ -34,23 +34,8 @@ module Cabinet(
         gridfinity_footprint.y * GRIDFINITY_GRID_LENGTH
     ];
 
-    assert(
-        gridfinity_footprint.x % 1 == 0,
-        str(
-            "ERROR: Invalid gridfinity_footprint.x value ",
-            gridfinity_footprint.x,
-            " must be an integer."
-        )
-    );
-
-    assert(
-        gridfinity_footprint.y % 1 == 0,
-        str(
-            "ERROR: Invalid gridfinity_footprint.y value ",
-            gridfinity_footprint.y,
-            " must be an integer."
-        )
-    );
+    valid_x = assert_integer_value(name="gridfinity_footprint.x", value=gridfinity_footprint.x);
+    valid_y = assert_integer_value(name="gridfinity_footprint.y", value=gridfinity_footprint.y);
 
     for (row = grid) {
         assert(
@@ -63,24 +48,8 @@ module Cabinet(
         );
     }
 
-    assert(
-        base[0] == NO_BASE || base[0] == GRIDFINITY_BASE,
-        str(
-            "ERROR: Invalid base style: ",
-            base[0]
-        )
-    );
-
-    assert(
-        top[0] == NO_TOP
-        || top[0] == LIP_TOP
-        || top[0] == GRIDFINITY_STACKING_TOP
-        || top[0] == GRIDFINITY_BASEPLATE_MAGNET_TOP,
-        str(
-            "ERROR: Invalid top style: ",
-            top[0]
-        )
-    );
+    valid_base = assert_valid_cabinet_base_style(base[0]);
+    valid_top = assert_valid_cabinet_top_style(top[0]);
 
     module DrawerStop() {
         // Width of the drawer stop across the slot opening.

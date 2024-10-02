@@ -40,3 +40,42 @@ function sum_vector(vector, index=0, running_sum=0) =
 function sub_vector(vector, end_index) = end_index <= 0 ? [] : [
     for (i = [0: end_index - 1]) if (i < len(vector)) vector[i]
 ];
+
+function assert_integer_value(name, value) =
+    assert(
+        value % 1 == 0,
+        str(
+            "ERROR: Invalid ",
+            name,
+            " value ",
+            value,
+            " MUST be an integer."
+        )
+    )
+    true;
+
+function assert_positive_integer_value(name, value) =
+    assert(
+        value % 1 == 0 && value > 0,
+        str(
+            "ERROR: Invalid ",
+            name,
+            " value ",
+            value,
+            " MUST be a positive integer."
+        )
+    )
+    true;
+
+function assert_positive_value(name, value) =
+    assert(
+        value > 0,
+        str(
+            "ERROR: Invalid ",
+            name,
+            " value ",
+            value,
+            " MUST be positive."
+        )
+    )
+    true;

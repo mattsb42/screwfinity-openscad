@@ -78,32 +78,12 @@ module Drawer(
     minimum_interior_width = 0.1;
     body_chamfer = 1;
 
-    assert(
-        dimensions.x > 0 && dimensions.y > 0 && dimensions.z > 0,
-        str(
-            "ERROR: All dimensions MUST be positive. ",
-            dimensions
-        )
-    );
-
-    assert(
-        dimensions.y % 1 == 0,
-        str(
-            "ERROR: Invalid unit_depth value ",
-            dimensions.y,
-            " must be an integer."
-        )
-    );
+    valid_width = assert_positive_value(name="width", value=dimensions.x);
+    valid_depth = assert_positive_integer_value(name="unit depth", value=dimensions.y);
+    valid_height = assert_positive_value(name="height", value=dimensions.z);
 
     for(cell = fill_properties)
-        let(style=cell[4])
-        assert(
-            style == NO_CUT || style == SQUARE_CUT || style == SCOOP_CUT,
-            str(
-                "ERROR: Invalid cell cut type ",
-                style
-            )
-        );
+        let(valid_style=assert_valid_drawer_cell_cut_style(cell[4]));
 
     assert(
         len(handle_properties) == 3,
@@ -114,31 +94,13 @@ module Drawer(
     );
 
     handle_style = handle_properties[0];
-    assert(
-        handle_style == TRIANGLE_HANDLE,
-        str(
-            "ERROR: Invalid handle style",
-            handle_style
-        )
-    );
+    valid_handle_style = assert_valid_drawer_handle_style(handle_style);
 
     handle_depth = handle_properties[1];
-    assert(
-        handle_depth > 0,
-        str(
-            "ERROR: Invalid handle depth",
-            handle_depth
-        )
-    );
+    valid_handle_depth = assert_positive_value(name="handle depth", value=handle_depth);
 
     label_cut = handle_properties[2];
-    assert(
-        label_cut == NO_LABEL_CUT || label_cut == LABEL_CUT,
-        str(
-            "ERROR: Invalid label cut type",
-            label_cut
-        )
-    );
+    valid_label_cut = assert_valid_drawer_label_cut_style(label_cut);
 
     outside_dimensions = drawer_outside_dimensions(dimensions);
     maximum_inside_width = outside_dimensions.x - (2 * drawer_wall);

@@ -33,10 +33,10 @@ def test_drawer(label_cut, fill_type, width, depth, height, wall):
 @pytest.mark.parametrize(
         "width, depth, height, error_message",
         [
-            pytest.param(-1, 1, 10, "All dimensions MUST be positive", id="negative width"),
-            pytest.param(1, -1, 10, "All dimensions MUST be positive", id="negative depth"),
-            pytest.param(1, 1, -10, "All dimensions MUST be positive", id="negative height"),
-            pytest.param(1, 1.5, 10, "Invalid unit_depth value", id="non-integer depth"),
+            pytest.param(-1, 1, 10, "Invalid width value", id="negative width"),
+            pytest.param(1, -1, 10, "Invalid unit depth value", id="negative depth"),
+            pytest.param(1, 1, -10, "Invalid height value", id="negative height"),
+            pytest.param(1, 1.5, 10, "Invalid unit depth value", id="non-integer depth"),
             # maybe break out too-narrow drawers into their own broader test case later
             pytest.param(0.1, 1, 10, "Drawer width is too narrow", id="width too narrow"),
         ],
