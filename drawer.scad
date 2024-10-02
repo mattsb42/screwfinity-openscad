@@ -141,19 +141,15 @@ module Drawer(
     );
 
     outside_dimensions = drawer_outside_dimensions(dimensions);
-    inside = [
-        outside_dimensions.x - (2 * drawer_wall),
-        outside_dimensions.y - (2 * drawer_wall),
-        outside_dimensions.z - drawer_wall
-    ];
+    maximum_inside_width = outside_dimensions.x - (2 * drawer_wall);
 
     assert(
-        inside.x >= minimum_interior_width,
+        maximum_inside_width >= minimum_interior_width,
         str(
             "ERROR: Drawer width is too narrow.",
             " With unit width ", dimensions.x,
             " and drawer wall thickness ", drawer_wall,
-            " the drawer interior width is ", inside.x, ".",
+            " the drawer interior width is ", maximum_inside_width, ".",
             " Recommend reducing drawer width to no more than ",
             (outside_dimensions.x - minimum_interior_width) / 2
         )
