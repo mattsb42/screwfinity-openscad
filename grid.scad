@@ -38,19 +38,9 @@ and can span both columns and rows.
 Both colspan and rowspan MUST be positive integers.
 */
 function cell(style, colspan=1, rowspan=1) =
-    assert(
-        rowspan > 0 && rowspan % 1 == 0,
-        str(
-            "ERROR: rowspan MUST be a positive integer: ",
-            rowspan
-        )
-    )
-    assert(
-        colspan > 0 && colspan % 1 == 0,
-        str(
-            "ERROR: colspan MUST be a positiive integer: ",
-            colspan
-        )
+    let(
+        valid_rowspan=assert_positive_integer_value(name="rowspan", value=rowspan),
+        valid_colspan=assert_positive_integer_value(name="colspan", value=colspan)
     )
     [style, colspan, rowspan];
 
@@ -100,21 +90,9 @@ Returns an array of cell offset descriptions
 that Drawer and Cabinet understand.
 */
 function grid(row_count, column_count, row_data) =
-    assert(
-        row_count > 0 && row_count % 1 == 0,
-        str(
-            "ERROR: row_count MUST be a positive integer: ",
-            row_count
-        )
-    )
-    assert(
-        column_count > 0 && column_count % 1 == 0,
-        str(
-            "ERROR: column_count MUST be a positive integer: ",
-            column_count
-        )
-    )
     let(
+        valid_row_count=assert_positive_integer_value(name="row_count", value=row_count),
+        valid_column_count=assert_positive_integer_value(name="column_count", value=column_count),
         column_width=(1 / column_count),
         row_height=(1 / row_count)
     )
