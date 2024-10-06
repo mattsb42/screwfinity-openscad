@@ -25,15 +25,14 @@ module GridCabinet(
         height,
     ];
     inner_shell_dimensions = [
-        outer_dimensions.x - cabinet_wall,
-        outer_dimensions.y - cabinet_wall,
-        outer_dimensions.z - cabinet_wall,
+        // the outer walls should be 2x the inner wall thickness
+        // because of the uniform buffer for the inner cuts,
+        // the x and z dimensions need an extra inner wall buffer
+        // on the outer wall
+        outer_dimensions.x - (cabinet_wall * 3),
+        outer_dimensions.y - (cabinet_wall * 2),
+        outer_dimensions.z - (cabinet_wall * 3),
     ];
-
-    // make a solid shell
-    // use grid to cut drawer slots
-    //  - outer shell has one wall width on each wall
-    //  - each drawer slot needs an inner buffer
 
     /**
      * Get the Z position of the top of the shell.
@@ -59,24 +58,26 @@ module GridCabinet(
         // because that's what grid-math assumes
         translate([
             inner_shell_dimensions.x / 2,
-            0,
+            // center on the cutout depth
+            (outer_dimensions.y - inner_shell_dimensions.y) / 2,
             inner_shell_dimensions.z / 2
         ])
         for(cut = grid)
             let(
                 x_offset=cut[0],
                 z_offset=cut[1],
+                y_offset=cabinet_wall * 2,
                 x_percentage=cut[2],
                 z_percentage=cut[3]
             )
             translate([
                 -1 * (inner_shell_dimensions.x - (inner_shell_dimensions.x * x_offset)),
-                cabinet_wall,
+                0,
                 -1 * (inner_shell_dimensions.z * z_offset)
             ])
             let(cut_dimensions=[
                 (inner_shell_dimensions.x * x_percentage) - cabinet_wall,
-                outer_dimensions.y - cabinet_wall,
+                inner_shell_dimensions.y,
                 (inner_shell_dimensions.z * z_percentage) - cabinet_wall
             ])
             color("red")
