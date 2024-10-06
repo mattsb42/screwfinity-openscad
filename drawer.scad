@@ -190,10 +190,6 @@ module Drawer(
                 style=cut[4]
             )
             translate([
-                // For reasons that don't grok in my brain right now,
-                // the grid is rotated 180 degrees on the y axis.
-                // This means that we have to reverse the x coordinate
-                // or we get a mirror image of what we intended.
                 fill_outside_dimensions.x - (fill_outside_dimensions.x * x_offset),
                 fill_outside_dimensions.y * y_offset,
                 (drawer_wall / 2)

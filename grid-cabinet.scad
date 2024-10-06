@@ -4,6 +4,7 @@ use <./cabinet.scad>;
 use <./cabinet-bases.scad>;
 use <./cabinet-tops.scad>;
 use <./cabinet-slots.scad>;
+use <./MCAD/boxes.scad>;
 
 module GridCabinet(
     gridfinity_footprint,
@@ -45,7 +46,12 @@ module GridCabinet(
     function bottom_of_shell() = -1 * outer_dimensions.z / 2;
 
     module CabinetBody() {
-        cube(outer_dimensions, center=true);
+        roundedCube(
+            size=outer_dimensions,
+            r=0.5,
+            sidesonly=false,
+            center=true
+        );
     }
 
     module DrawerSlots() {
