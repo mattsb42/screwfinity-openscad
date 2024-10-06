@@ -3,6 +3,7 @@ include <./options.scad>;
 use <./util.scad>;
 use <./cabinet-tops.scad>;
 use <./cabinet-bases.scad>;
+use <./cabinet-slots.scad>;
 use <./gridfinity-rebuilt-openscad/gridfinity-rebuilt-holes.scad>;
 
 
@@ -47,59 +48,6 @@ module Cabinet(
 
     valid_base = assert_valid_cabinet_base_style(base[0]);
     valid_top = assert_valid_cabinet_top_style(top[0]);
-
-    module DrawerStop() {
-        // Width of the drawer stop across the slot opening.
-        stop_width = 20;
-        // Horizonal distance from end of drawer stop to the peak.
-        slope_run = 0.5;
-        // Height of drawer stop.
-        stop_height = 1;
-
-        stop_base = [
-            // inner edge
-            [[-1 * stop_width / 2, DRAWER_STOP / 2, 0], [stop_width / 2, DRAWER_STOP / 2, 0]],
-            // outer edge
-            [[-1 * stop_width / 2, -1 * DRAWER_STOP / 2, 0], [stop_width / 2, -1 * DRAWER_STOP / 2, 0]],
-        ];
-        stop_peak = [
-            [-1 * (stop_width / 2 - slope_run), 0, stop_height], [stop_width / 2 - slope_run, 0, stop_height],
-        ];
-        polyhedron(
-            points=[
-                stop_base[0].x,
-                stop_base[0].y,
-                stop_base[1].x,
-                stop_base[1].y,
-                stop_peak.x,
-                stop_peak.y,
-            ],
-            faces=[
-                // bottom face
-                [0, 2, 3, 1],
-                // inner slope
-                [0, 1, 5, 4],
-                // outer slope
-                [2, 4, 5, 3],
-                // left slope
-                [0, 4, 2],
-                // right slope
-                [1, 3, 5],
-            ]
-        );
-    }
-
-    module DrawerSlotNegative(dimensions) {
-        difference(){
-            cube(dimensions, center=true);
-            translate([
-                0,
-                (dimensions.y / 2) - (DRAWER_STOP / 2),
-                -1 * dimensions.z / 2
-            ])
-                DrawerStop();
-        }
-    }
 
     module SolidCabinet(dimensions) {
         difference() {
