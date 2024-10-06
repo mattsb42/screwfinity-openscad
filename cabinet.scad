@@ -1,24 +1,21 @@
 include <./constants.scad>;
 include <./options.scad>;
 use <./util.scad>;
-use <./gridfinity-rebuilt-openscad/gridfinity-rebuilt-utility.scad>;
+use <./cabinet-tops.scad>;
+use <./cabinet-bases.scad>;
 use <./gridfinity-rebuilt-openscad/gridfinity-rebuilt-holes.scad>;
-use <./gridfinity-rebuilt-openscad/gridfinity-rebuilt-baseplate.scad>;
-include <./gridfinity-rebuilt-openscad/standard.scad>;
 
 
-default_hole_options = bundle_hole_options(
-    magnet_hole=true,
-    crush_ribs=true
-);
+function drawer_slot_options(unit_width, height) = [unit_width, 0, height];
 
-function drawer_slot_options (unit_width, height) = [unit_width, 0, height];
+function grid_expand(drawer, rows) = [for (i = [0:rows -1]) drawer];
 
-function grid_expand (drawer, rows) = [for (i = [0:rows -1]) drawer];
-
-function surface_options (
+function surface_options(
     style,
-    hole_options=default_hole_options
+    hole_options=bundle_hole_options(
+        magnet_hole=true,
+        crush_ribs=true
+    )
 ) = [style, hole_options];
 
 module Cabinet(
@@ -236,83 +233,17 @@ module Cabinet(
             cube([outer_footprint.x, outer_footprint.y, outer_wall], center=true);
     }
 
-    module GridFinityBase () {
-        translate([0, 0, bottom_of_shell() - 5]) 
-        color("red")
-            gridfinityBase(
-                gx=gridfinity_footprint.x,
-                gy=gridfinity_footprint.y,
-                l=GRIDFINITY_GRID_LENGTH,
-                dx=0,
-                dy=0,
-                hole_options=base[1]
-            );
-    }
-
-    module CabinetBase() {
-        if(base[0] == GRIDFINITY_BASE) GridFinityBase();
-    }
-
-    module LipTop() {
-        cross_section = [2, 4];
-        translate([0, 0, top_of_shell() + (cross_section.y / 2)]) {
-            // add a rim around the lip; the lip by itself is too thin at the edge
-            outer_buffer_width = 0.25;
-            color("blue")
-            difference() {
-                cube([outer_footprint.x, outer_footprint.y, cross_section.y], center=true);
-                // make the cut-out cube taller to remove render preview artifacts
-                cube([outer_footprint.x - outer_buffer_width, outer_footprint.y - outer_buffer_width, cross_section.y + 1], center=true);
-            }
-            // add the lip
-            color("green")
-                Lip(
-                    footprint=[outer_footprint.x - outer_buffer_width, outer_footprint.y - outer_buffer_width],
-                    cross_section=cross_section,
-                    center=true
-                );
-        }
-    }
-
-    module GridFinityStackingLip() {
-        // There's an extra 1mm offset somewhere (haven't pinned down where it comes from)
-        //  and add an extra micrometer to remove render artifacts.
-        actual_offset = h_base + 1.001;
-        translate([0, 0, top_of_shell() - actual_offset]) {
-            difference() {
-                gridfinityInit(gx = gridfinity_footprint.x, gy = gridfinity_footprint.y, h = 1);
-                translate([-1 * outer_footprint.x / 2, -1 * outer_footprint.y / 2, 0])
-                    cube([outer_footprint.x, outer_footprint.y, actual_offset]);
-            }
-        }
-    }
-
-    module GridFinityMagnetBaseplateLip() {
-        // offset one micrometer above the bottom of the magnet hole
-        offset = 4.361;
-        translate([0, 0, top_of_shell() - offset]) {
-            difference() {
-                gridfinityBaseplate(
-                    grid_size_bases=gridfinity_footprint,
-                    length=GRIDFINITY_GRID_LENGTH,
-                    min_size_mm = [0,0],
-                    sp=2,
-                    hole_options=default_hole_options,
-                    sh=0
-                );
-                translate([-1 * outer_footprint.x / 2 - 1, -1 * outer_footprint.y / 2 - 1, -1])
-                    cube([outer_footprint.x + 2, outer_footprint.y + 2, offset + 1]);
-            }
-        }
-    }
-
-    module CabinetTop() {
-        if(top[0] == LIP_TOP) LipTop();
-        else if(top[0] == GRIDFINITY_STACKING_TOP) GridFinityStackingLip();
-        else if(top[0] == GRIDFINITY_BASEPLATE_MAGNET_TOP) GridFinityMagnetBaseplateLip();
-    }
-
-    CabinetTop();
+    translate([0, 0, top_of_shell()])
+        CabinetTop(
+            gridfinity_footprint=gridfinity_footprint,
+            outer_footprint=outer_footprint,
+            style=top[0]
+        );
     CabinetBody();
-    CabinetBase();
+    translate([0, 0, bottom_of_shell()])
+        CabinetBase(
+            gridfinity_footprint=gridfinity_footprint,
+            style=base[0],
+            hole_options=base[1]
+        );
 }

@@ -21,6 +21,36 @@ DEFAULT_HANDLE_DEPTH = 8;
 Helper to assemble a drawer options structure.
 */
 function drawer_options(unit_width, unit_depth, height) = [unit_width, unit_depth, height];
+// TODO: Give an option to provide either unit_width or width,
+// calculate absolute width here,
+// and use that inside Drawer.
+
+function drawer_outer_dimensions_from_gridfinity_units(unit_width, unit_depth, height) = [
+    (unit_width * GRIDFINITY_GRID_LENGTH) - GU_TO_DU - (DRAWER_TOLERANCE * 2),
+    (unit_depth * GRIDFINITY_GRID_LENGTH) - CABINET_REAR_WALL - DRAWER_STOP,
+    height,
+];
+
+function drawer_outer_dimensions_from_grid_dimensions(
+    cabinet_height,
+    cabinet_unit_width,
+    cabinet_unit_depth,
+    columns,
+    rows,
+    colspan,
+    rowspan
+) = 
+    let(
+        cabinet_width=cabinet_unit_width * GRIDFINITY_GRID_LENGTH,
+        cabinet_depth=cabinet_unit_depth * GRIDFINITY_GRID_LENGTH,
+        drawer_slug_width=(cabinet_width / columns) * colspan,
+        drawer_slug_height=(cabinet_height / rows) * rowspan,
+        // TODO: rethink what GU_TO_DU means here
+        drawer_width=drawer_slug_width - GU_TO_DU - (DRAWER_TOLERANCE * 2),
+        drawer_depth=cabinet_depth - CABINET_REAR_WALL - DRAWER_STOP
+        // TODO: drawer_height is similarly impacted by GU_TO_DU rethink
+    )
+    [];
 
 /**
 Helper to assemble a handle properties structure.
