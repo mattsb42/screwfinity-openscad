@@ -96,7 +96,7 @@ module GridCabinet(
                 z_percentage=cut[3]
             )
             translate([
-                -1 * (inner_shell_dimensions.x - (inner_shell_dimensions.x * x_offset)),
+                -1 * (inner_shell_dimensions.x * x_offset),
                 0,
                 -1 * (inner_shell_dimensions.z * z_offset)
             ])
