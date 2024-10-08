@@ -17,6 +17,11 @@ LABEL_SLOT_FACE_OFFSET = 0.5;
 // distance from front face of drawer to outer edge of handle
 DEFAULT_HANDLE_DEPTH = 8;
 
+/**
+ * Helper to calculate drawer dimensions using gridfinity units.
+ *
+ * Use this if you want Screwfinity-compatible drawers.
+ */
 function drawer_outer_dimensions_from_gridfinity_units(unit_width, unit_depth, height) = 
     let(
         valid_width=assert_positive_value(name="width", value=unit_width),
@@ -29,6 +34,11 @@ function drawer_outer_dimensions_from_gridfinity_units(unit_width, unit_depth, h
         height,
     ];
 
+/**
+ * Helper to calculate drawer dimensions using grid dimensions.
+ *
+ * Use this if you want drawers for GridCabinet cabinets.
+ */
 function drawer_outer_dimensions_from_grid_dimensions(
     cabinet_dimensions,
     cabinet_wall,
@@ -230,24 +240,14 @@ module Drawer(
 }
 
 
-module Label(drawer_unit_dimensions, handle_depth=DEFAULT_HANDLE_DEPTH) {
-    assert(
-        drawer_unit_dimensions.x > 0 && drawer_unit_dimensions.y > 0 && drawer_unit_dimensions.z > 0,
-        str(
-            "ERROR: All dimensions MUST be positive. ",
-            drawer_unit_dimensions
-        )
-    );
+module Label(drawer_dimensions, handle_depth=DEFAULT_HANDLE_DEPTH) {
 
-    assert(
-        handle_depth > 0,
-        str(
-            "ERROR: Handle depth MUST be positive",
-            handle_depth
-        )
-    );
+    valid_width = assert_positive_value(name="width", value=drawer_dimensions.x);
+    valid_depth = assert_positive_value(name="depth", value=drawer_dimensions.y);
+    valid_height = assert_positive_value(name="height", value=drawer_dimensions.z);
 
-    drawer_dimensions = drawer_outside_dimensions(drawer_unit_dimensions);
+    valid_handle_depth = assert_positive(name="handle depth", value=handle_depth);
+
     label_slot_y_offset = handle_depth - LABEL_SLOT_FACE_OFFSET;
 
     label_dimensions = [
