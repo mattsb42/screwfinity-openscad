@@ -6,60 +6,85 @@ use <./cabinet-tops.scad>;
 use <./cabinet-slots.scad>;
 use <./MCAD/boxes.scad>;
 
+function inner_shell(outer_dimensions, cabinet_wall) = [
+    // the outer walls should be 2x the inner wall thickness
+    // because of the uniform buffer for the inner cuts,
+    // the x and z dimensions need an extra inner wall buffer
+    // on the outer wall
+    outer_dimensions.x - (cabinet_wall * 3),
+    outer_dimensions.y - (cabinet_wall * 2),
+    outer_dimensions.z - (cabinet_wall * 3),
+];
+
+
+function cabinet_dimensions_from_gridfinity_footprint(
+    gridfinity_units_width,
+    gridfinity_units_depth,
+    height
+) = [
+    gridfinity_units_width * GRIDFINITY_GRID_LENGTH,
+    gridfinity_units_depth * GRIDFINITY_GRID_LENGTH,
+    height
+];
+
+
 module GridCabinet(
-    gridfinity_footprint,
-    height,
+    dimensions,
     grid,
     base=surface_options(style=GRIDFINITY_BASE),
     top=surface_options(style=GRIDFINITY_STACKING_TOP),
     cabinet_wall=1.0,
 ) {
-    valid_x = assert_integer_value(name="gridfinity_footprint.x", value=gridfinity_footprint.x);
-    valid_y = assert_integer_value(name="gridfinity_footprint.y", value=gridfinity_footprint.y);
+    valid_x = assert_positive_integer_value(name="dimensions.x", value=dimensions.x);
+    valid_y = assert_positive_integer_value(name="dimensions.y", value=dimensions.y);
+    valid_z = assert_positive_integer_value(name="dimensions.z", value=dimensions.z);
     valid_base = assert_valid_cabinet_base_style(base[0]);
     valid_top = assert_valid_cabinet_top_style(top[0]);
 
-    outer_dimensions = [
-        gridfinity_footprint.x * GRIDFINITY_GRID_LENGTH,
-        gridfinity_footprint.y * GRIDFINITY_GRID_LENGTH,
-        height,
+    gridfinity_footprint = [
+        floor(dimensions.x / GRIDFINITY_GRID_LENGTH),
+        floor(dimensions.y / GRIDFINITY_GRID_LENGTH)
     ];
-    inner_shell_dimensions = [
-        // the outer walls should be 2x the inner wall thickness
-        // because of the uniform buffer for the inner cuts,
-        // the x and z dimensions need an extra inner wall buffer
-        // on the outer wall
-        outer_dimensions.x - (cabinet_wall * 3),
-        outer_dimensions.y - (cabinet_wall * 2),
-        outer_dimensions.z - (cabinet_wall * 3),
-    ];
+
+    inner_shell_dimensions = inner_shell(dimensions, cabinet_wall);
 
     /**
      * Get the Z position of the top of the shell.
      */
-    function top_of_shell() = outer_dimensions.z / 2;
+    function top_of_shell() = dimensions.z / 2;
 
     /**
      * Get the Z position of the bottom of the shell.
      */
-    function bottom_of_shell() = -1 * outer_dimensions.z / 2;
+    function bottom_of_shell() = -1 * dimensions.z / 2;
 
+    /**
+     * Create the central cabinet body.
+     */
     module CabinetBody() {
+        // For some reason, this ends up 0.086mm small in every dimension.
+        // I have no clue why,
+        // but that's a small enough issue
+        // that I'm not going to worry about it for now.
         roundedCube(
-            size=outer_dimensions,
+            size=dimensions,
             r=0.5,
             sidesonly=false,
             center=true
         );
     }
 
-    module DrawerSlots() {
+    /**
+     * Create the shapes for all drawer slots,
+     * that can then be removed from a solid geometry.
+     */
+    module GridDrawerSlotsNegative() {
         // reset to the top left
         // because that's what grid-math assumes
         translate([
             inner_shell_dimensions.x / 2,
             // center on the cutout depth
-            (outer_dimensions.y - inner_shell_dimensions.y) / 2,
+            (dimensions.y - inner_shell_dimensions.y) / 2,
             inner_shell_dimensions.z / 2
         ])
         for(cut = grid)
@@ -87,12 +112,12 @@ module GridCabinet(
     translate([0, 0, top_of_shell()])
         CabinetTop(
             gridfinity_footprint=gridfinity_footprint,
-            outer_footprint=outer_dimensions,
+            outer_footprint=dimensions,
             style=top[0]
         );
     difference(){
         CabinetBody();
-        DrawerSlots();
+        GridDrawerSlotsNegative();
     }
     translate([0, 0, bottom_of_shell()])
         CabinetBase(
