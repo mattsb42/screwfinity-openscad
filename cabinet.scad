@@ -49,6 +49,10 @@ module Cabinet(
     valid_base = assert_valid_cabinet_base_style(base[0]);
     valid_top = assert_valid_cabinet_top_style(top[0]);
 
+    /**
+     * Create a solid cabinet as a base.
+     * Used by CabinetRow to create a "cabinet" for each row.
+     */
     module SolidCabinet(dimensions) {
         difference() {
             cube(dimensions, center=true);
@@ -89,6 +93,11 @@ module Cabinet(
             ];
 
     /**
+     * Create a cabinet row with a consistent drawer cutout,
+     * uniformly spaced across the width of the cabinet.
+     *
+     * @param row_drawer_height     The height of every drawer in this row.
+     * @param row_drawer_width      The width of every drawer in this row.
      */
     module CabinetRow(row_drawer_height, row_drawer_width) {
         // Inner dimensions of a drawer slot cutout.
